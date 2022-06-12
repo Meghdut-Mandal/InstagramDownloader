@@ -28,13 +28,12 @@ public class InsShared {
     private static final String FILE_NAME = "ins_shared";
     private static SharedPreferences.Editor editor;
 
-    /* renamed from: sp */
-    private static SharedPreferences f202sp;
+    private static SharedPreferences sharedPreferences;
     private static InsShared tbShared;
 
     public InsShared(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(FILE_NAME, 0);
-        f202sp = sharedPreferences;
+        InsShared.sharedPreferences = sharedPreferences;
         editor = sharedPreferences.edit();
     }
 
@@ -71,19 +70,19 @@ public class InsShared {
     public Object getValue(String str, Object obj) {
         String simpleName = obj.getClass().getSimpleName();
         if ("String".equals(simpleName)) {
-            return f202sp.getString(str, (String) obj);
+            return sharedPreferences.getString(str, (String) obj);
         }
         if ("int".equals(simpleName) || "Integer".equals(simpleName)) {
-            return f202sp.getInt(str, ((Integer) obj).intValue());
+            return sharedPreferences.getInt(str, ((Integer) obj).intValue());
         }
         if ("Boolean".equals(simpleName)) {
-            return f202sp.getBoolean(str, ((Boolean) obj).booleanValue());
+            return sharedPreferences.getBoolean(str, ((Boolean) obj).booleanValue());
         }
         if ("Float".equals(simpleName)) {
-            return f202sp.getFloat(str, ((Float) obj).floatValue());
+            return sharedPreferences.getFloat(str, ((Float) obj).floatValue());
         }
         if ("Long".equals(simpleName)) {
-            return f202sp.getLong(str, ((Long) obj).longValue());
+            return sharedPreferences.getLong(str, ((Long) obj).longValue());
         }
         return null;
     }
@@ -103,7 +102,7 @@ public class InsShared {
 
     public <V> Map<String, V> getHashMapData(String str, Class<V> cls) {
         try {
-            String string = f202sp.getString(str, "");
+            String string = sharedPreferences.getString(str, "");
             if (string == null) {
                 return null;
             }
@@ -141,7 +140,7 @@ public class InsShared {
         try {
             ArrayList arrayList = new ArrayList();
             Gson gson = new Gson();
-            String string = f202sp.getString(str, (String) null);
+            String string = sharedPreferences.getString(str, (String) null);
             if (string != null) {
                 if (!"".equals(string)) {
                     Iterator<JsonElement> it = new JsonParser().parse(string).getAsJsonArray().iterator();
@@ -181,7 +180,7 @@ public class InsShared {
 
     public Object getEntity(String str) {
         try {
-            String string = f202sp.getString(str, (String) null);
+            String string = sharedPreferences.getString(str, (String) null);
             if (TextUtils.isEmpty(string)) {
                 return null;
             }
@@ -191,14 +190,8 @@ public class InsShared {
             objectInputStream.close();
             byteArrayInputStream.close();
             return readObject;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            return null;
-        } catch (ClassNotFoundException e2) {
-            e2.printStackTrace();
-            return null;
-        } catch (Exception e3) {
-            e3.printStackTrace();
             return null;
         }
     }

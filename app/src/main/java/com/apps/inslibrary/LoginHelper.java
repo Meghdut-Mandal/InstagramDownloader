@@ -2,6 +2,7 @@ package com.apps.inslibrary;
 
 import android.text.TextUtils;
 import com.apps.inslibrary.entity.login.ReelUser;
+import com.apps.inslibrary.utils.InsShared;
 
 public class LoginHelper {
     public static String COOKIES = "Cookies";
@@ -83,5 +84,6 @@ public class LoginHelper {
         InsManager.shared.remove(SESSION_ID);
         InsManager.shared.remove(USERID);
         InsManager.shared.remove(USER_INFO);
+        InsManager.shared.clearShared();
     }
 }
