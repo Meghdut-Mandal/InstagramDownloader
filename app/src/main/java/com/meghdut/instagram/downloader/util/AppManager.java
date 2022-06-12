@@ -17,14 +17,14 @@ public class AppManager {
     private static final String SHOW_TYPE = "show_type";
 
     public static boolean isShowRateApp() {
-        int intValue = ((Integer) InsManager.shared.getValue(RATE_APP_KEY, 0)).intValue();
+        int intValue = (Integer) InsManager.shared.getValue(RATE_APP_KEY, 0);
         if (intValue == -1) {
             return false;
         }
         if (intValue == 0) {
             Calendar calendar = Calendar.getInstance();
             calendar.add(5, 5);
-            InsManager.shared.setValue(RATE_APP_KEY, Integer.valueOf(calendar.get(5)));
+            InsManager.shared.setValue(RATE_APP_KEY, calendar.get(5));
             return false;
         }
         int i = Calendar.getInstance().get(5);
@@ -36,35 +36,35 @@ public class AppManager {
     }
 
     public static void setRedDot(boolean z) {
-        InsManager.shared.setValue(DOT_KEY, Boolean.valueOf(z));
+        InsManager.shared.setValue(DOT_KEY, z);
     }
 
     public static boolean getRedDot() {
-        return ((Boolean) InsManager.shared.getValue(DOT_KEY, false)).booleanValue();
+        return (Boolean) InsManager.shared.getValue(DOT_KEY, false);
     }
 
     public static void setEZRedDot(boolean z) {
-        InsManager.shared.setValue(DOT_EZ_KEY, Boolean.valueOf(z));
+        InsManager.shared.setValue(DOT_EZ_KEY, z);
     }
 
     public static boolean getEZRedDot() {
-        return ((Boolean) InsManager.shared.getValue(DOT_EZ_KEY, true)).booleanValue();
+        return (Boolean) InsManager.shared.getValue(DOT_EZ_KEY, true);
     }
 
     public static void setShowDownType(int i) {
-        InsManager.shared.setValue(SHOW_TYPE, Integer.valueOf(i));
+        InsManager.shared.setValue(SHOW_TYPE, i);
     }
 
     public static int getShowDownType() {
-        return ((Integer) InsManager.shared.getValue(SHOW_TYPE, 0)).intValue();
+        return (Integer) InsManager.shared.getValue(SHOW_TYPE, 0);
     }
 
     public static void setFilterType(int i) {
-        InsManager.shared.setValue(FILTER_TYPE, Integer.valueOf(i));
+        InsManager.shared.setValue(FILTER_TYPE, i);
     }
 
     public static int getFilterType() {
-        return ((Integer) InsManager.shared.getValue(FILTER_TYPE, 0)).intValue();
+        return (Integer) InsManager.shared.getValue(FILTER_TYPE, 0);
     }
 
     public static SettingParams getSettingConfig() {
@@ -77,11 +77,11 @@ public class AppManager {
     }
 
     public static boolean getFirstStart() {
-        return ((Boolean) InsManager.shared.getValue(IS_FIRST, true)).booleanValue();
+        return (Boolean) InsManager.shared.getValue(IS_FIRST, true);
     }
 
     public static void setFirstStart(boolean z) {
-        InsManager.shared.setValue(IS_FIRST, Boolean.valueOf(z));
+        InsManager.shared.setValue(IS_FIRST, z);
     }
 
     public static boolean canShowNotification(Context context) {
