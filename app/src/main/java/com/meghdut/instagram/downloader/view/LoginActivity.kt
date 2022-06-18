@@ -28,6 +28,7 @@ class LoginActivity : AppCompatActivity() {
     private fun loadPage(loginBinding: ActivityLoginBinding) = loginBinding.apply {
         webView.settings.javaScriptEnabled = true
         webView.clearCache(true)
+        webView.clearHistory()
         webView.webViewClient = MyBrowser()
         webView.loadUrl("https://www.instagram.com/accounts/login/")
         webView.webChromeClient = object : WebChromeClient() {
@@ -50,6 +51,8 @@ class LoginActivity : AppCompatActivity() {
     }
 
     inner class MyBrowser : WebViewClient() {
+
+        @Deprecated("Deprecated in Java")
         override fun shouldOverrideUrlLoading(webView: WebView, str: String): Boolean {
             webView.loadUrl(str)
             return true

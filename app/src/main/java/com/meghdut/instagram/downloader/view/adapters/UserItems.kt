@@ -3,19 +3,19 @@ package com.meghdut.instagram.downloader.view.adapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import coil.load
-import com.apps.inslibrary.reelentity.ReelsEntity
+import com.apps.inslibrary.entity.InstagramUser
 import com.meghdut.instagram.downloader.databinding.ItemLatestHeadLayoutBinding
 import com.mikepenz.fastadapter.binding.AbstractBindingItem
 
-class StoriesItems(val reelsEntity: ReelsEntity) :
+class UserItems (val instagramUser: InstagramUser) :
     AbstractBindingItem<ItemLatestHeadLayoutBinding>() {
 
     override val type: Int
         get() = 23
 
     override fun bindView(binding: ItemLatestHeadLayoutBinding, payloads: List<Any>) {
-        binding.ivHead.load(reelsEntity.userHead)
-        binding.tvAdd.text = reelsEntity.userName
+        binding.ivHead.load(instagramUser.profile_pic_url)
+        binding.tvAdd.text = instagramUser.username
     }
 
     override fun createBinding(

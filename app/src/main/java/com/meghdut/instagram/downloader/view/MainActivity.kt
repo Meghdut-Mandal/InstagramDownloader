@@ -1,6 +1,5 @@
 package com.meghdut.instagram.downloader.view
 
-import android.Manifest
 import android.Manifest.permission.*
 import android.app.Activity
 import android.content.Intent
@@ -21,13 +20,12 @@ import com.apps.inslibrary.LoginHelper
 import com.apps.inslibrary.entity.InstagramData
 import com.apps.inslibrary.http.InsHttpManager
 import com.apps.inslibrary.interfaces.HttpListener
-import com.apps.inslibrary.utils.InsShared
 import com.google.android.material.snackbar.Snackbar
-import com.meghdut.instagram.downloader.R
 import com.meghdut.instagram.downloader.databinding.ActivityMainBinding
 import com.meghdut.instagram.downloader.repository.MainViewModel
 import com.meghdut.instagram.downloader.util.DownHistoryHelper
-import com.meghdut.instagram.downloader.view.adapters.StoryItem
+import com.meghdut.instagram.downloader.view.adapters.StoriesItems
+import com.meghdut.instagram.downloader.view.adapters.UserItems
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import pub.devrel.easypermissions.AfterPermissionGranted
@@ -41,9 +39,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     private val viewModel: MainViewModel by viewModels()
-    private val itemAdapter by lazy { ItemAdapter<StoryItem>() }
+    private val storyItemAdapter by lazy { ItemAdapter<StoriesItems>() }
+    private val userItemAdapter by lazy { ItemAdapter<UserItems>() }
 
-    private val fastAdapter by lazy { FastAdapter.with(itemAdapter) }
+    private val storiesAdapter by lazy { FastAdapter.with(storyItemAdapter) }
+    private val userAdapter by lazy { FastAdapter.with(userItemAdapter) }
 
 
     private val resultLauncher =
@@ -62,42 +62,69 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         InsManager.init(application)
 
-        binding.loginButton.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
-            resultLauncher.launch(intent)
-        }
-        binding.startButton.setOnClickListener {
-            downloadReel()
-        }
-        binding.clearCookies.setOnClickListener {
-            LoginHelper.outLogin()
-            finish()
-        }
 
-        viewModel.loadUserData()
-        val linearLayoutManager = LinearLayoutManager(applicationContext)
-        linearLayoutManager.orientation = LinearLayoutManager.HORIZONTAL
-        binding.storiesRv.layoutManager = linearLayoutManager
-        binding.storiesRv.adapter = fastAdapter
+        binding.apply {
+            loginButton.setOnClickListener {
+                val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                resultLauncher.launch(intent)
+            }
+
+            startButton.setOnClickListener {
+                downloadReel()
+            }
 
 
-        viewModel.userInfo.observe(this) {
-            it?.let { reelUser ->
-                binding.userDp.load(reelUser.profile_pic_url)
-                binding.userName.text = reelUser.username
+            clearCookies.setOnClickListener {
+                LoginHelper.outLogin()
+                finish()
+            }
+
+//            viewModel.loadUserData()
+
+            val linearLayoutManager = LinearLayoutManager(applicationContext).apply {
+                orientation = LinearLayoutManager.HORIZONTAL
+            }
+            storiesRv.layoutManager = linearLayoutManager
+            storiesRv.adapter = storiesAdapter
+
+            val linearLayoutManager2 = LinearLayoutManager(applicationContext).apply {
+                orientation = LinearLayoutManager.HORIZONTAL
+
+            }
+            recentUsers.layoutManager = linearLayoutManager2
+            recentUsers.adapter = userAdapter
+
+            viewModel.apply {
+                loadData.setOnClickListener {
+                    loadUserData()
+                }
+
+                recentUsers.observe(this@MainActivity) { list ->
+                    list?.let { recentUser ->
+                        val userList = recentUser.map { UserItems(it) }
+                        userItemAdapter.set(userList)
+                    }
+                }
+                userInfo.observe(this@MainActivity) {
+                    it?.let { reelUser ->
+                        userDp.load(reelUser.profile_pic_url)
+                        userName.text = reelUser.username
+                    }
+                }
+                userStories.observe(this@MainActivity) { list ->
+                    list?.let { stories ->
+                        val storyList = stories.map { StoriesItems(it) }
+                        storyItemAdapter.set(storyList)
+                    }
+                }
+                messageLiveData.observe(this@MainActivity) {
+                    it?.let {
+                        toast(it)
+                    }
+                }
             }
         }
-        viewModel.userStories.observe(this) { list ->
-            list?.let { stories ->
-                val storyList = stories.map { StoryItem(it) }
-                itemAdapter.set(storyList)
-            }
-        }
-        viewModel.messageLiveData.observe(this){
-            it?.let {
-                toast(it)
-            }
-        }
+
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -141,6 +168,26 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    private fun queryUserStories(url: String) {
+        var cookies = LoginHelper.getCookies()
+        if (TextUtils.isEmpty(cookies)) {
+            cookies = LoginHelper.getTmpCookies()
+            if (TextUtils.isEmpty(cookies)) {
+                TODO("not yet done")
+//                TODO()
+//                queryTmpCookies(true, "", url)
+                return
+            }
+        }
+        getRedirectUrl(cookies, url)
+    }
+
+    fun getRedirectUrl(cookies: String, url: String) {
+
+//        AnonymousClass12(str2, url).start()
+    }
+
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
@@ -151,21 +198,30 @@ class MainActivity : AppCompatActivity() {
         // Forward results to EasyPermissions
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
     }
-    companion object{
+
+    companion object {
         const val RC_PERMISSION = 23
     }
 
     @AfterPermissionGranted(RC_PERMISSION)
     fun downloadReel() {
         val perms =
-            arrayOf(WRITE_EXTERNAL_STORAGE, ACCESS_NETWORK_STATE,READ_EXTERNAL_STORAGE,FOREGROUND_SERVICE,WAKE_LOCK)
+            arrayOf(
+                WRITE_EXTERNAL_STORAGE,
+                ACCESS_NETWORK_STATE,
+                READ_EXTERNAL_STORAGE,
+                FOREGROUND_SERVICE,
+                WAKE_LOCK
+            )
         if (EasyPermissions.hasPermissions(this, *perms)) {
             val link = binding.instaLinkEt.text.toString().trim()
             queryInsShareData(link)
         } else {
             // Do not have permissions, request them now
-            EasyPermissions.requestPermissions(this, "Please Approve",
-                RC_PERMISSION, *perms);
+            EasyPermissions.requestPermissions(
+                this, "Please Approve",
+                RC_PERMISSION, *perms
+            );
         }
 
     }
@@ -179,21 +235,18 @@ class MainActivity : AppCompatActivity() {
         }
         val hostUrl = InsManager.getHostUrl(str)
         InsHttpManager.getShareData(hostUrl, cookies, object : HttpListener<InstagramData?> {
-            // from class: com.apps.instagram.downloader.fragment.HomeFragment.9
-            // com.apps.inslibrary.interfaces.HttpListener
-            override fun onLogin(z: Boolean) {}
+            override fun onLogin(z: Boolean) {
+
+            }
+
             override fun onSuccess(instagramData: InstagramData?) {
-//                FirebaseHelper.onEvent("verifyShareUrlYes", "")
                 instagramData?.shareUrl = str
                 instagramData?.viewUrl = str
-//                this@HomeFragment.stateDialog.setDownloading()
                 viewModel.down(instagramData!!)
             }
 
-            // com.apps.inslibrary.interfaces.HttpListener
             override fun onError(str2: String) {
                 Log.e("TAG_1", "onError:$str2")
-//                FirebaseHelper.onEvent("verifyShareUrlNo", "")
                 toast("Download Failed $str")
             }
 

@@ -299,9 +299,9 @@ public class DownHistoryHelper {
         return 0;
     }
 
+    @Deprecated
     public static List<InstagramUser> getReverseDownUserInfo4() {
         List<InstagramUser> downUserInfo = getDownUserInfo();
-        InstagramUser eZMoneyUser = getEZMoneyUser();
         if (downUserInfo != null && downUserInfo.size() > 0) {
             Collections.reverse(downUserInfo);
             ArrayList<InstagramUser> arrayList = new ArrayList<>();
@@ -311,7 +311,6 @@ public class DownHistoryHelper {
                 }
                 arrayList.add(instagramUser);
             }
-            arrayList.add(0, eZMoneyUser);
             return arrayList;
         }
         return new ArrayList<>();

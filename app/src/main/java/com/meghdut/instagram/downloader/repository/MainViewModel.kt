@@ -6,7 +6,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.apps.inslibrary.InstagramRes
 import com.apps.inslibrary.LoginHelper
+import com.apps.inslibrary.entity.FollowResult
 import com.apps.inslibrary.entity.InstagramData
+import com.apps.inslibrary.entity.InstagramUser
 import com.apps.inslibrary.entity.login.ReelUser
 import com.apps.inslibrary.http.HttpManager
 import com.apps.inslibrary.http.InsHttpManager
@@ -21,25 +23,23 @@ import java.util.concurrent.Executors
 
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
-      var shareUrl: String = ""
+    var shareUrl: String = ""
     private var resSize: Int = 0
-    val executor: ExecutorService = Executors.newSingleThreadExecutor()
+    private val executor: ExecutorService = Executors.newSingleThreadExecutor()
     val userInfo = MutableLiveData<ReelUser>()
     val userStories = MutableLiveData<List<ReelsEntity>>()
+    val recentUsers = MutableLiveData<List<InstagramUser>>()
     val messageLiveData = MutableLiveData<String>()
 
     fun loadUserData() {
         if (LoginHelper.getIsLogin()) {
-            executor.submit {
-                loadUserInfo()
-            }
-            executor.submit {
-                loadStories()
-            }
+            loadCurrentUserInfo()
+            loadStories()
+            loadRecentlyVisitedUsers()
         }
     }
 
-    private fun loadUserInfo() {
+    private fun loadCurrentUserInfo() = executor.submit {
         val userId = LoginHelper.getUserID()
         HttpManager.queryUserInfoByUserID(userId, object : HttpListener<ReelUser> {
             override fun onError(str: String?) {
@@ -57,11 +57,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     }
 
-    fun post(text:String){
+    fun post(text: String) {
         messageLiveData.postValue(text)
     }
 
-    private fun loadStories() {
+    private fun loadStories() = executor.submit {
         val cookies = LoginHelper.getCookies()
         InsHttpManager.getReelsTrayData(cookies, object : HttpListener<List<ReelsEntity>> {
             override fun onError(str: String?) {
@@ -85,12 +85,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val size = instagramRes.size
             this.resSize = size
             for (instagramRes2 in instagramRes) {
-               startSingleDown(instagramRes2,instagramData)
+                startSingleDown(instagramRes2, instagramData)
             }
         }
     }
 
-    private fun startSingleDown(instagramRes: InstagramRes, instagramData: InstagramData){
+    private fun startSingleDown(instagramRes: InstagramRes, instagramData: InstagramData) {
         val instagramUser = instagramData.instagramUser
         val video_url =
             if (instagramRes.isIs_video) instagramRes.video_url else instagramRes.display_url
@@ -104,24 +104,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 override fun onStart() {}
 
                 override fun onSuccess(file: File) {
-//                    FirebaseHelper.onEvent("downloaderYes", "")
-//                    this@HomeFragment.ll_down.setFocusable(true)
-//                    this@HomeFragment.ll_down.setClickable(true)
                     instagramRes.saveFile = file.absolutePath
-//                    this@HomeFragment.showInterstitialAd(instagramData)
                     this@MainViewModel.shareUrl = ""
                     DownHistoryHelper.addDownHistory(instagramData)
-                    // Post process of download
-//                    if (this@HomeFragment.settingConfig.isAutoFollow()) {
-//                        DownHistoryHelper.addDownUserInfo(instagramData.instagramUser)
-//                        this@HomeFragment.downUserList = DownHistoryHelper.getReverseDownUserInfo4()
-//                        this@HomeFragment.tv_more.setVisibility(if (DownHistoryHelper.getUserSize() > 2) 0 else 8)
-//                        if (this@HomeFragment.accountAdapter != null) {
-//                            this@HomeFragment.accountAdapter.refreshNewData(this@HomeFragment.downUserList)
-//                        }
-//                        EventBus.getDefault().post(EventBusEntity(1012))
-//                    }
-//                    EventBus.getDefault().post(EventBusEntity(1010))
                     post("Download Complete !")
                 }
 
@@ -136,5 +121,25 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 //                    this@HomeFragment.stateDialog.setTryAgain(instagramData.shareUrl)
                 }
             })
+    }
+
+    private fun loadRecentlyVisitedUsers() {
+        val userId = LoginHelper.getUserID()
+        val cookie = LoginHelper.getCookies()
+        executor.submit {
+            InsHttpManager.getUserFollows(userId, cookie, object : HttpListener<FollowResult> {
+                override fun onError(error: String?) {
+                   throw Exception(error)
+                }
+
+                override fun onLogin(isLoggedIn: Boolean) = Unit
+
+                override fun onSuccess(result: FollowResult?) {
+                    result?.apply {
+                        recentUsers.postValue(users)
+                    }
+                }
+            })
+        }
     }
 }
