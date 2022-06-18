@@ -18,6 +18,7 @@ import coil.load
 import com.apps.inslibrary.InsManager
 import com.apps.inslibrary.LoginHelper
 import com.apps.inslibrary.entity.InstagramData
+import com.apps.inslibrary.entity.InstagramUser
 import com.apps.inslibrary.http.InsHttpManager
 import com.apps.inslibrary.interfaces.HttpListener
 import com.google.android.material.snackbar.Snackbar
@@ -95,13 +96,19 @@ class MainActivity : AppCompatActivity() {
             recentUsers.adapter = userAdapter
 
             viewModel.apply {
-                loadData.setOnClickListener {
-                    loadUserData()
-                }
+//                loadData.setOnClickListener {
+                loadUserData()
+//                }
 
                 recentUsers.observe(this@MainActivity) { list ->
                     list?.let { recentUser ->
-                        val userList = recentUser.map { UserItems(it) }
+                        val userList = recentUser.map { it ->
+                            UserItems(it).apply {
+                                onClickListener = { instagramUser ->
+                                    launchUserActivity(instagramUser)
+                                }
+                            }
+                        }
                         userItemAdapter.set(userList)
                     }
                 }
@@ -125,6 +132,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+    }
+
+    private fun launchUserActivity(instagramUser: InstagramUser) {
+        val intent = Intent(applicationContext, InstagramUserActivity::class.java)
+        intent.putExtra(INSTAGRAM_USER, instagramUser.username)
+        startActivity(intent)
     }
 
     override fun onSupportNavigateUp(): Boolean {

@@ -31,11 +31,12 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".view.LoginActivity"
-            android:theme="@style/Theme.InstagramDownloader"
-            >
-
-        </activity>
+        <activity
+            android:name=".view.LoginActivity"
+            android:theme="@style/Theme.InstagramDownloader" />
+        <activity
+            android:name=".view.InstagramUserActivity"
+            android:theme="@style/Theme.InstagramDownloader" />
     </application>
 
 </manifest>
