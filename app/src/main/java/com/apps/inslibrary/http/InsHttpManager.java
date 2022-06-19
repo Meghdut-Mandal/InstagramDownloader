@@ -224,7 +224,7 @@ public class InsHttpManager {
             get(requestParams, new OnHttpCallback() {
                 public void onSuccess(String str) {
                     try {
-                        UserInfoPageResult userInfoPageResult = (UserInfoPageResult) new Gson().fromJson(str, UserInfoPageResult.class);
+                        UserInfoPageResult userInfoPageResult = new Gson().fromJson(str, UserInfoPageResult.class);
                         if (userInfoPageResult != null) {
                             GraphqlUser user = userInfoPageResult.getData().getUser();
                             if (httpListener != null) {

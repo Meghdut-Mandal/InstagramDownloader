@@ -140,7 +140,7 @@ public class InsShared {
         try {
             ArrayList arrayList = new ArrayList();
             Gson gson = new Gson();
-            String string = sharedPreferences.getString(str, (String) null);
+            String string = sharedPreferences.getString(str, null);
             if (string != null) {
                 if (!"".equals(string)) {
                     Iterator<JsonElement> it = new JsonParser().parse(string).getAsJsonArray().iterator();
@@ -152,7 +152,7 @@ public class InsShared {
             }
             return null;
         } catch (Exception e) {
-            Log.i("getList异常信息>>>", e.toString() + "");
+            Log.i("getList异常信息>>>", e + "");
             e.printStackTrace();
             return null;
         }

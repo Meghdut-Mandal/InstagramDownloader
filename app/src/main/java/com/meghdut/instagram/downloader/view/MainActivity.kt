@@ -18,7 +18,6 @@ import coil.load
 import com.apps.inslibrary.InsManager
 import com.apps.inslibrary.LoginHelper
 import com.apps.inslibrary.entity.InstagramData
-import com.apps.inslibrary.entity.InstagramUser
 import com.apps.inslibrary.http.InsHttpManager
 import com.apps.inslibrary.interfaces.HttpListener
 import com.google.android.material.snackbar.Snackbar
@@ -105,7 +104,7 @@ class MainActivity : AppCompatActivity() {
                         val userList = recentUser.map { it ->
                             UserItems(it).apply {
                                 onClickListener = { instagramUser ->
-                                    launchUserActivity(instagramUser)
+                                    launchUserActivity(instagramUser.username)
                                 }
                             }
                         }
@@ -120,7 +119,13 @@ class MainActivity : AppCompatActivity() {
                 }
                 userStories.observe(this@MainActivity) { list ->
                     list?.let { stories ->
-                        val storyList = stories.map { StoriesItems(it) }
+                        val storyList = stories.map {
+                            StoriesItems(it).apply {
+                                onClickListener = {
+                                    launchUserActivity(it.userName)
+                                }
+                            }
+                        }
                         storyItemAdapter.set(storyList)
                     }
                 }
@@ -134,9 +139,9 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun launchUserActivity(instagramUser: InstagramUser) {
+    private fun launchUserActivity(instagramUser: String) {
         val intent = Intent(applicationContext, InstagramUserActivity::class.java)
-        intent.putExtra(INSTAGRAM_USER, instagramUser.username)
+        intent.putExtra(INSTAGRAM_USER, instagramUser)
         startActivity(intent)
     }
 

@@ -10,12 +10,17 @@ import com.mikepenz.fastadapter.binding.AbstractBindingItem
 class StoriesItems(val reelsEntity: ReelsEntity) :
     AbstractBindingItem<ItemLatestHeadLayoutBinding>() {
 
+    var onClickListener: (ReelsEntity) -> Unit = {}
+
     override val type: Int
         get() = 23
 
     override fun bindView(binding: ItemLatestHeadLayoutBinding, payloads: List<Any>) {
         binding.ivHead.load(reelsEntity.userHead)
         binding.tvAdd.text = reelsEntity.userName
+        binding.root.setOnClickListener {
+            onClickListener(reelsEntity)
+        }
     }
 
     override fun createBinding(

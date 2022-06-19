@@ -22,7 +22,7 @@ public class Stories2Item {
         this.code = str;
     }
 
-    public String getId() {
+    public String  getId() {
         return this.id;
     }
 
