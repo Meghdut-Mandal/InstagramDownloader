@@ -8,8 +8,7 @@ public class InstagramData implements Serializable {
     private String coverUrl;
     private String describe;
 
-    /* renamed from: id */
-    private String f174id;
+    private String id;
     private List<InstagramRes> instagramRes;
     private InstagramUser instagramUser;
     private boolean isCheck;
@@ -76,11 +75,11 @@ public class InstagramData implements Serializable {
     }
 
     public String getId() {
-        return this.f174id;
+        return this.id;
     }
 
     public void setId(String str) {
-        this.f174id = str;
+        this.id = str;
     }
 
     public InstagramUser getInstagramUser() {

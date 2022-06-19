@@ -14,8 +14,7 @@ public class EdgesNode implements Serializable {
     private Count edge_media_to_comment;
     private EdgeOwnerToTimelineMedia edge_sidecar_to_children;
 
-    /* renamed from: id */
-    private long f198id;
+    private long id;
     private boolean is_video;
     private EdgesNodeOwner owner;
     private String shortcode;
@@ -32,11 +31,11 @@ public class EdgesNode implements Serializable {
     }
 
     public long getId() {
-        return this.f198id;
+        return this.id;
     }
 
     public void setId(long j) {
-        this.f198id = j;
+        this.id = j;
     }
 
     public String getShortcode() {

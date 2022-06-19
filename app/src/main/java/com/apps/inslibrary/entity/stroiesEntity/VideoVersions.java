@@ -5,8 +5,7 @@ import java.io.Serializable;
 public class VideoVersions implements Serializable {
     private int height;
 
-    /* renamed from: id */
-    private String f192id;
+    private String id;
     private int type;
     private String url;
     private int width;
@@ -44,10 +43,10 @@ public class VideoVersions implements Serializable {
     }
 
     public String getId() {
-        return this.f192id;
+        return this.id;
     }
 
     public void setId(String str) {
-        this.f192id = str;
+        this.id = str;
     }
 }

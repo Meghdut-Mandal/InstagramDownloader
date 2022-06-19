@@ -4,16 +4,15 @@ import java.io.Serializable;
 
 public class EdgesNodeOwner implements Serializable {
 
-    /* renamed from: id */
-    private String f199id;
+    private String id;
     private String username;
 
     public String getId() {
-        return this.f199id;
+        return this.id;
     }
 
     public void setId(String str) {
-        this.f199id = str;
+        this.id = str;
     }
 
     public String getUsername() {

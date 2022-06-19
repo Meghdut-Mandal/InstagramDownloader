@@ -5,17 +5,16 @@ import java.io.Serializable;
 
 public class CarouselMedia implements Serializable {
 
-    /* renamed from: id */
-    private String f178id;
+    private String id;
     private ImageVersions2 image_versions2;
     private int media_type;
 
     public String getId() {
-        return this.f178id;
+        return this.id;
     }
 
     public void setId(String str) {
-        this.f178id = str;
+        this.id = str;
     }
 
     public int getMedia_type() {

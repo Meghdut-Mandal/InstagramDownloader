@@ -5,8 +5,8 @@ public class LoginReel {
     private long expiring_at;
     private boolean has_pride_media;
 
-    /* renamed from: id */
-    private String f176id;
+
+    private String id;
     private int latest_reel_media;
     private ReelUser owner;
     private ReelUser user;
@@ -20,11 +20,11 @@ public class LoginReel {
     }
 
     public String getId() {
-        return this.f176id;
+        return this.id;
     }
 
     public void setId(String str) {
-        this.f176id = str;
+        this.id = str;
     }
 
     public long getExpiring_at() {

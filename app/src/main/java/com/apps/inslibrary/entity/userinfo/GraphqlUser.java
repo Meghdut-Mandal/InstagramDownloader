@@ -11,8 +11,7 @@ public class GraphqlUser implements Serializable {
     private long fbid;
     private String full_name;
 
-    /* renamed from: id */
-    private String f200id;
+    private String id;
     private String profile_pic_url;
     private String profile_pic_url_hd;
     private String username;
@@ -58,11 +57,11 @@ public class GraphqlUser implements Serializable {
     }
 
     public String getId() {
-        return this.f200id;
+        return this.id;
     }
 
     public void setId(String str) {
-        this.f200id = str;
+        this.id = str;
     }
 
     public String getUsername() {

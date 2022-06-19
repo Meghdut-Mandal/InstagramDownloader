@@ -6,8 +6,7 @@ import java.util.List;
 
 public class ReelsMedia implements Serializable {
 
-    /* renamed from: id */
-    private long f188id;
+    private long id;
     private List<ReelsMediaItems> items;
     private int media_count;
     private List<String> media_ids;
@@ -15,11 +14,11 @@ public class ReelsMedia implements Serializable {
     private ShortcodeMediaOwner user;
 
     public long getId() {
-        return this.f188id;
+        return this.id;
     }
 
     public void setId(long j) {
-        this.f188id = j;
+        this.id = j;
     }
 
     public ShortcodeMediaOwner getUser() {

@@ -10,8 +10,7 @@ public class ShortcodeMedia implements Serializable {
     private EdgeMediaToCaption edge_media_to_caption;
     private EdgeSidecarToChildren edge_sidecar_to_children;
 
-    /* renamed from: id */
-    private String f181id;
+    private String id;
     private boolean is_video;
     private ShortcodeMediaOwner owner;
     private String shortcode;
@@ -20,11 +19,11 @@ public class ShortcodeMedia implements Serializable {
     private String video_url;
 
     public String getId() {
-        return this.f181id;
+        return this.id;
     }
 
     public void setId(String str) {
-        this.f181id = str;
+        this.id = str;
     }
 
     public String getShortcode() {

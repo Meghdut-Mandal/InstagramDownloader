@@ -5,8 +5,7 @@ import java.util.List;
 public class ReelsStoriesMedia {
     private CoverMedia cover_media;
 
-    /* renamed from: id */
-    private String f193id;
+    private String id;
     private List<StoriesItems> items;
     private long latest_reel_media;
     private int media_count;
@@ -15,11 +14,11 @@ public class ReelsStoriesMedia {
     private StoriesUser user;
 
     public String getId() {
-        return this.f193id;
+        return this.id;
     }
 
     public void setId(String str) {
-        this.f193id = str;
+        this.id = str;
     }
 
     public long getLatest_reel_media() {

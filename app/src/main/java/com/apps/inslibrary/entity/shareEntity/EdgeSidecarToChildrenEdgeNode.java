@@ -7,18 +7,17 @@ public class EdgeSidecarToChildrenEdgeNode implements Serializable {
     private List<DisplayResource> display_resources;
     private String display_url;
 
-    /* renamed from: id */
-    private String f179id;
+    private String id;
     private boolean is_video;
     private String shortcode;
     private String video_url;
 
     public String getId() {
-        return this.f179id;
+        return this.id;
     }
 
     public void setId(String str) {
-        this.f179id = str;
+        this.id = str;
     }
 
     public String getShortcode() {

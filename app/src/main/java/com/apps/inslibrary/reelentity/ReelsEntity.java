@@ -4,8 +4,7 @@ import java.io.Serializable;
 
 public class ReelsEntity implements Serializable {
 
-    /* renamed from: id */
-    private long f201id;
+    private long id;
     private long latestTime;
     private String userHead;
     private String userName;
@@ -27,11 +26,11 @@ public class ReelsEntity implements Serializable {
     }
 
     public long getId() {
-        return this.f201id;
+        return this.id;
     }
 
     public void setId(long j) {
-        this.f201id = j;
+        this.id = j;
     }
 
     public long getLatestTime() {

@@ -6,13 +6,11 @@ import java.util.List;
 public class ReelsMediaItems implements Serializable {
     private String code;
 
-    /* renamed from: id */
-    private String f189id;
+    private String id;
     private ImageVersions2 image_versions2;
     private int media_type;
 
-    /* renamed from: pk */
-    private String f190pk;
+    private String pk;
     private List<StoryFeedMedia> story_feed_media;
     private long taken_at;
     private double video_duration;
@@ -35,19 +33,19 @@ public class ReelsMediaItems implements Serializable {
     }
 
     public String getPk() {
-        return this.f190pk;
+        return this.pk;
     }
 
     public void setPk(String str) {
-        this.f190pk = str;
+        this.pk = str;
     }
 
     public String getId() {
-        return this.f189id;
+        return this.id;
     }
 
     public void setId(String str) {
-        this.f189id = str;
+        this.id = str;
     }
 
     public String getCode() {

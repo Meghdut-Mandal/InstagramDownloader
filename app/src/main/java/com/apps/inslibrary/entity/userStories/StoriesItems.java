@@ -6,8 +6,7 @@ import java.util.List;
 
 public class StoriesItems {
 
-    /* renamed from: id */
-    private String f194id;
+    private String id;
     private ImageVersions2 image_versions2;
     private int media_type;
 
@@ -34,11 +33,11 @@ public class StoriesItems {
     }
 
     public String getId() {
-        return this.f194id;
+        return this.id;
     }
 
     public void setId(String str) {
-        this.f194id = str;
+        this.id = str;
     }
 
     public int getMedia_type() {

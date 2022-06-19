@@ -5,17 +5,16 @@ import java.util.List;
 
 public class ReelsMediaStories2 {
 
-    /* renamed from: id */
-    private long f185id;
+    private long id;
     private List<Stories2Item> items;
     private StoriesUser user;
 
     public long getId() {
-        return this.f185id;
+        return this.id;
     }
 
     public void setId(long j) {
-        this.f185id = j;
+        this.id = j;
     }
 
     public List<Stories2Item> getItems() {

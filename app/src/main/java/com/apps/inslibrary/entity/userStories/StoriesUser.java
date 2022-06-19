@@ -6,18 +6,17 @@ public class StoriesUser {
     private boolean is_private;
     private boolean is_verified;
 
-    /* renamed from: pk */
-    private long f196pk;
+    private long pk;
     private String profile_pic_id;
     private String profile_pic_url;
     private String username;
 
     public long getPk() {
-        return this.f196pk;
+        return this.pk;
     }
 
     public void setPk(long j) {
-        this.f196pk = j;
+        this.pk = j;
     }
 
     public String getUsername() {

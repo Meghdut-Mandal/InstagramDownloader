@@ -7,13 +7,11 @@ import java.util.List;
 public class Stories2Item {
     private String code;
 
-    /* renamed from: id */
-    private String f186id;
+    private String id;
     private ImageVersions2 image_versions2;
     private int media_type;
 
-    /* renamed from: pk */
-    private String f187pk;
+    private String pk;
     private List<VideoVersions> video_versions;
 
     public String getCode() {
@@ -25,19 +23,19 @@ public class Stories2Item {
     }
 
     public String getId() {
-        return this.f186id;
+        return this.id;
     }
 
     public void setId(String str) {
-        this.f186id = str;
+        this.id = str;
     }
 
     public String getPk() {
-        return this.f187pk;
+        return this.pk;
     }
 
     public void setPk(String str) {
-        this.f187pk = str;
+        this.pk = str;
     }
 
     public int getMedia_type() {

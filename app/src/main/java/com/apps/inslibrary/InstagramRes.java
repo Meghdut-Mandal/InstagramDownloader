@@ -5,8 +5,7 @@ import java.io.Serializable;
 public class InstagramRes implements Serializable {
     private String display_url;
 
-    /* renamed from: id */
-    private String f153id;
+    private String id;
     private boolean is_video;
     private String saveFile;
     private String shortcode;
@@ -17,7 +16,7 @@ public class InstagramRes implements Serializable {
     }
 
     public InstagramRes(String str, boolean z, String str2, String str3) {
-        this.f153id = str;
+        this.id = str;
         this.is_video = z;
         this.shortcode = str2;
         if (z) {
@@ -44,11 +43,11 @@ public class InstagramRes implements Serializable {
     }
 
     public String getId() {
-        return this.f153id;
+        return this.id;
     }
 
     public void setId(String str) {
-        this.f153id = str;
+        this.id = str;
     }
 
     public String getShortcode() {

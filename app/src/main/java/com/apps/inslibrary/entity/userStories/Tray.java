@@ -4,8 +4,7 @@ public class Tray {
     private CoverMedia cover_media;
     private String created_at;
 
-    /* renamed from: id */
-    private String f197id;
+    private String id;
     private long latest_reel_media;
     private int media_count;
     private int prefetch_count;
@@ -13,11 +12,11 @@ public class Tray {
     private StoriesUser user;
 
     public String getId() {
-        return this.f197id;
+        return this.id;
     }
 
     public void setId(String str) {
-        this.f197id = str;
+        this.id = str;
     }
 
     public long getLatest_reel_media() {

@@ -9,8 +9,7 @@ public class Items implements Serializable {
     private List<CarouselMedia> carousel_media;
     private String code;
 
-    /* renamed from: id */
-    private String f180id;
+    private String id;
     private ImageVersions2 image_versions2;
     private int media_type;
     private ShortcodeMediaOwner user;
@@ -21,11 +20,11 @@ public class Items implements Serializable {
     }
 
     public String getId() {
-        return this.f180id;
+        return this.id;
     }
 
     public void setId(String str) {
-        this.f180id = str;
+        this.id = str;
     }
 
     public int getMedia_type() {
