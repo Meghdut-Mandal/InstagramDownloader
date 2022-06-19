@@ -5,12 +5,11 @@ import android.text.TextUtils
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.apps.inslibrary.InsManager
 import com.apps.inslibrary.InstagramRes
 import com.apps.inslibrary.LoginHelper
-import com.apps.inslibrary.entity.FollowResult
 import com.apps.inslibrary.entity.InstagramData
-import com.apps.inslibrary.entity.InstagramUser
 import com.apps.inslibrary.entity.login.ReelUser
 import com.apps.inslibrary.http.HttpManager
 import com.apps.inslibrary.http.InsHttpManager
@@ -19,15 +18,15 @@ import com.apps.inslibrary.reelentity.ReelsEntity
 import com.apps.inslibrary.utils.DownUtils
 import com.apps.inslibrary.utils.DownUtils.OnDownCallback
 import com.meghdut.instagram.downloader.util.DownHistoryHelper
+import com.meghdut.instagram.downloader.view.ui.igRequest
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import java.io.File
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
     var shareUrl: String = ""
     private var resSize: Int = 0
-    private val executor: ExecutorService = Executors.newSingleThreadExecutor()
     val userInfo = MutableLiveData<ReelUser>()
     val userStories = MutableLiveData<List<ReelsEntity>>()
     val messageLiveData = MutableLiveData<String>()
@@ -39,44 +38,27 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun loadCurrentUserInfo() = executor.submit {
+    private fun loadCurrentUserInfo() = viewModelScope.launch {
         val userId = LoginHelper.getUserID()
-        HttpManager.queryUserInfoByUserID(userId, object : HttpListener<ReelUser> {
-            override fun onError(str: String?) {
-                throw Exception("Get user Info Failed $str")
-            }
-
-            override fun onLogin(z: Boolean) {
-            }
-
-            override fun onSuccess(user: ReelUser?) {
-                LoginHelper.addUserInfo(user)
-                userInfo.postValue(user)
-            }
-        })
-
+        igRequest {
+            HttpManager.queryUserInfoByUserID(userId, it)
+        }.collectLatest { user ->
+            LoginHelper.addUserInfo(user)
+            userInfo.postValue(user)
+        }
     }
 
     fun post(text: String) {
         messageLiveData.postValue(text)
     }
 
-    private fun loadStories() = executor.submit {
+    private fun loadStories() = viewModelScope.launch {
         val cookies = LoginHelper.getCookies()
-        InsHttpManager.getReelsTrayData(cookies, object : HttpListener<List<ReelsEntity>> {
-            override fun onError(str: String?) {
-                userStories.postValue(listOf())
-//                throw Exception("Get stories Failed $str")
-            }
-
-            override fun onLogin(z: Boolean) {
-                userStories.postValue(listOf())
-            }
-
-            override fun onSuccess(result: List<ReelsEntity>) {
-                userStories.postValue(result)
-            }
-        })
+        igRequest {
+            InsHttpManager.getReelsTrayData(cookies, it)
+        }.collectLatest {
+            userStories.postValue(it)
+        }
     }
 
     fun down(instagramData: InstagramData) {
@@ -123,30 +105,20 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             })
     }
 
-    fun queryInsShareData(str: String) {
+    fun queryInsShareData(str: String) = viewModelScope.launch {
         val cookies = LoginHelper.getCookies()
         if (TextUtils.isEmpty(cookies)) {
 //            queryNoLoginShareData(str)
-            return
+            return@launch
         }
         val hostUrl = InsManager.getHostUrl(str)
-        InsHttpManager.getShareData(hostUrl, cookies, object : HttpListener<InstagramData?> {
-            override fun onLogin(z: Boolean) {
-
-            }
-
-            override fun onSuccess(instagramData: InstagramData?) {
-                instagramData?.shareUrl = str
-                instagramData?.viewUrl = str
-                down(instagramData!!)
-            }
-
-            override fun onError(str2: String) {
-                Log.e("TAG_1", "onError:$str2")
-                throw Exception(str2)
-            }
-
-        })
+        igRequest {
+            InsHttpManager.getShareData(hostUrl, cookies,it)
+        }.collectLatest { instagramData ->
+            instagramData?.shareUrl = str
+            instagramData?.viewUrl = str
+            down(instagramData!!)
+        }
     }
 
 

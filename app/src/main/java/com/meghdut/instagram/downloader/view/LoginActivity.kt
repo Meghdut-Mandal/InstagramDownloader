@@ -1,12 +1,13 @@
 package com.meghdut.instagram.downloader.view
 
-import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
-import android.webkit.*
+import android.webkit.CookieManager
+import android.webkit.WebChromeClient
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 import com.apps.inslibrary.LoginHelper
 import com.meghdut.instagram.downloader.databinding.ActivityLoginBinding
