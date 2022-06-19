@@ -22,4 +22,10 @@
         android:name="com.meghdut.instagram.downloader.view.ui.notifications.AccountsFragment"
         android:label="Accounts"
         tools:layout="@layout/fragment_accounts" />
+    <fragment
+        android:id="@+id/userProfileFragment"
+        android:name="com.meghdut.instagram.downloader.view.ui.profile.UserProfileFragment"
+        android:label="Profile" />
+
+
 </navigation>

@@ -1,4 +1,4 @@
-package com.meghdut.instagram.downloader.repository
+package com.meghdut.instagram.downloader.view.ui.profile
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-class UserViewModel(val app: Application) : AndroidViewModel(app) {
+class UserProfileViewModel(val app: Application) : AndroidViewModel(app) {
 
     val graphqlUserLiveData = MutableLiveData<GraphqlUser>()
     private val executor: ExecutorService = Executors.newSingleThreadExecutor()

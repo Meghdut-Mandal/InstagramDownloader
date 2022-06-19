@@ -1,50 +1,61 @@
-package com.meghdut.instagram.downloader.view
+package com.meghdut.instagram.downloader.view.ui.profile
 
 import android.os.Bundle
-import androidx.activity.viewModels
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import coil.load
 import com.meghdut.instagram.downloader.R
-import com.meghdut.instagram.downloader.databinding.ActivityInstagramUserBinding
-import com.meghdut.instagram.downloader.repository.UserViewModel
+import com.meghdut.instagram.downloader.databinding.FragmentUserProfileBinding
 import com.meghdut.instagram.downloader.util.format
+import com.meghdut.instagram.downloader.view.GridItemDecoration
 import com.meghdut.instagram.downloader.view.adapters.UserPostItems
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.GenericItem
 import com.mikepenz.fastadapter.adapters.GenericItemAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter
-import com.mikepenz.fastadapter.adapters.ItemAdapter.Companion.items
 import com.mikepenz.fastadapter.scroll.EndlessRecyclerOnScrollListener
 import com.mikepenz.fastadapter.ui.items.ProgressItem
 import kotlinx.coroutines.flow.collectLatest
 
-val INSTAGRAM_USER = "instagramUser"
+class UserProfileFragment : Fragment() {
 
-class InstagramUserActivity : AppCompatActivity(R.layout.activity_instagram_user) {
-    private val viewModel: UserViewModel by viewModels()
+
+    private val viewModel: UserProfileViewModel by viewModels({ requireActivity() })
+    private lateinit var binding: FragmentUserProfileBinding
+
+
     private val userPostItemsAdapter by lazy { ItemAdapter<UserPostItems>() }
     val progressItem = ProgressItem()
-    private val footerAdapter: GenericItemAdapter = items<GenericItem>().also {
+    private val footerAdapter: GenericItemAdapter = ItemAdapter.items<GenericItem>().also {
         it.add(progressItem)
     }
     private val adapter = FastAdapter.with(listOf(userPostItemsAdapter, footerAdapter))
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentUserProfileBinding.inflate(layoutInflater, container, false)
+        initUi()
 
-        super.onCreate(savedInstanceState)
-        val binding = ActivityInstagramUserBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        init(binding)
+        return binding.root
     }
 
+    private fun initUi() = binding.apply {
 
-    private fun init(binding: ActivityInstagramUserBinding) = binding.apply {
-        val gridLayoutManager = GridLayoutManager(this@InstagramUserActivity, 3)
+        val supportActionBar = (requireActivity() as? AppCompatActivity)?.supportActionBar
+
+        val gridLayoutManager = GridLayoutManager(requireContext(), 3)
         gridLayoutManager.orientation = GridLayoutManager.VERTICAL
         postsRecyclerView.addItemDecoration(
-            GridItemDecoration.Builder(this@InstagramUserActivity)
+            GridItemDecoration.Builder(requireContext())
                 .setHorizontalSpan(5.0f)
                 .setVerticalSpan(5.0f)
                 .setColor(R.color.white)
@@ -70,10 +81,11 @@ class InstagramUserActivity : AppCompatActivity(R.layout.activity_instagram_user
             }
         }
 
-        viewModel.graphqlUserLiveData.observe(this@InstagramUserActivity) {
+        viewModel.graphqlUserLiveData.observe(viewLifecycleOwner) {
             it?.let { graphqlUser ->
                 userBioTv.text = graphqlUser.biography
-                toolbar.title = graphqlUser.full_name
+                supportActionBar?.subtitle = graphqlUser.username
+                supportActionBar?.title = graphqlUser.full_name
                 userProfile.load(graphqlUser.profile_pic_url_hd)
                 userPostTv.text = graphqlUser.edge_owner_to_timeline_media.count.format()
                 userFollowTv.text = graphqlUser.edge_followed_by.count.format()
@@ -84,13 +96,7 @@ class InstagramUserActivity : AppCompatActivity(R.layout.activity_instagram_user
             }
         }
 
-        val username = intent.getSerializableExtra(INSTAGRAM_USER) as? String
-        if (username != null) {
-            viewModel.loadUser(username)
-            toolbar.subtitle = username
-
-        }
-
     }
+
 
 }

@@ -12,15 +12,16 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
 import com.apps.inslibrary.LoginHelper
 import com.google.android.material.snackbar.Snackbar
+import com.meghdut.instagram.downloader.R
 import com.meghdut.instagram.downloader.databinding.ActivityMainBinding
-import com.meghdut.instagram.downloader.view.INSTAGRAM_USER
-import com.meghdut.instagram.downloader.view.InstagramUserActivity
 import com.meghdut.instagram.downloader.view.LoginActivity
 import com.meghdut.instagram.downloader.view.adapters.StoriesItems
+import com.meghdut.instagram.downloader.view.ui.profile.UserProfileViewModel
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import pub.devrel.easypermissions.AfterPermissionGranted
@@ -33,6 +34,7 @@ class HomeFragment : Fragment(), EasyPermissions.PermissionCallbacks {
     private lateinit var binding: ActivityMainBinding
 
     private val viewModel: HomeViewModel by viewModels()
+    private val profileViewModel: UserProfileViewModel by viewModels({ requireActivity() })
     private val storyItemAdapter by lazy { ItemAdapter<StoriesItems>() }
     private val storiesAdapter by lazy { FastAdapter.with(storyItemAdapter) }
 
@@ -122,8 +124,6 @@ class HomeFragment : Fragment(), EasyPermissions.PermissionCallbacks {
     }
 
 
-
-
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String?>,
@@ -173,9 +173,9 @@ class HomeFragment : Fragment(), EasyPermissions.PermissionCallbacks {
 
 
     private fun launchUserActivity(instagramUser: String) {
-        val intent = Intent(activity, InstagramUserActivity::class.java)
-        intent.putExtra(INSTAGRAM_USER, instagramUser)
-        startActivity(intent)
+        profileViewModel.loadUser(instagramUser)
+        val navController = findNavController()
+        navController.navigate(R.id.userProfileFragment)
     }
 
 }

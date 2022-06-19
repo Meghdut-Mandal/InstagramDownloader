@@ -1,6 +1,5 @@
 package com.meghdut.instagram.downloader.view.ui.notifications
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,11 +7,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import com.meghdut.instagram.downloader.R
 import com.meghdut.instagram.downloader.databinding.FragmentAccountsBinding
-import com.meghdut.instagram.downloader.view.INSTAGRAM_USER
-import com.meghdut.instagram.downloader.view.InstagramUserActivity
 import com.meghdut.instagram.downloader.view.adapters.UserItems
+import com.meghdut.instagram.downloader.view.ui.profile.UserProfileViewModel
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 
@@ -21,6 +21,7 @@ class AccountsFragment : Fragment() {
     private lateinit var binding: FragmentAccountsBinding
     private val viewModel: AccountsViewModel by viewModels()
     private val userItemAdapter by lazy { ItemAdapter<UserItems>() }
+    private val profileViewModel: UserProfileViewModel by viewModels({ requireActivity() })
 
     private val userAdapter by lazy { FastAdapter.with(userItemAdapter) }
 
@@ -60,9 +61,9 @@ class AccountsFragment : Fragment() {
     }
 
     private fun launchUserActivity(instagramUser: String) {
-        val intent = Intent(activity, InstagramUserActivity::class.java)
-        intent.putExtra(INSTAGRAM_USER, instagramUser)
-        startActivity(intent)
+        profileViewModel.loadUser(instagramUser)
+        val navController = findNavController()
+        navController.navigate(R.id.userProfileFragment)
     }
 
 
