@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.GridLayoutManager
 import coil.load
 import com.meghdut.instagram.downloader.R
@@ -13,21 +12,23 @@ import com.meghdut.instagram.downloader.repository.UserViewModel
 import com.meghdut.instagram.downloader.util.format
 import com.meghdut.instagram.downloader.view.adapters.UserPostItems
 import com.mikepenz.fastadapter.FastAdapter
+import com.mikepenz.fastadapter.GenericItem
 import com.mikepenz.fastadapter.adapters.GenericItemAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter.Companion.items
 import com.mikepenz.fastadapter.scroll.EndlessRecyclerOnScrollListener
 import com.mikepenz.fastadapter.ui.items.ProgressItem
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 
 val INSTAGRAM_USER = "instagramUser"
 
 class InstagramUserActivity : AppCompatActivity(R.layout.activity_instagram_user) {
     private val viewModel: UserViewModel by viewModels()
     private val userPostItemsAdapter by lazy { ItemAdapter<UserPostItems>() }
-    private val footerAdapter: GenericItemAdapter = items()
+    val progressItem = ProgressItem()
+    private val footerAdapter: GenericItemAdapter = items<GenericItem>().also {
+        it.add(progressItem)
+    }
     private val adapter = FastAdapter.with(listOf(userPostItemsAdapter, footerAdapter))
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,10 +56,7 @@ class InstagramUserActivity : AppCompatActivity(R.layout.activity_instagram_user
             object : EndlessRecyclerOnScrollListener(footerAdapter) {
                 override fun onLoadMore(currentPage: Int) {
                     if (viewModel.canLoadMore){
-                        footerAdapter.clear()
-                        val progressItem = ProgressItem()
-                        progressItem.isEnabled = false
-                        footerAdapter.add(progressItem)
+                        progressItem.isEnabled = true
                         viewModel.loadMorePosts()
                     }
                 }
@@ -68,7 +66,7 @@ class InstagramUserActivity : AppCompatActivity(R.layout.activity_instagram_user
         lifecycleScope.launchWhenStarted {
             viewModel.edgesFlow.collectLatest { list ->
                 userPostItemsAdapter.add(list.map { UserPostItems(it) })
-                footerAdapter.clear()
+                progressItem.isEnabled = false
             }
         }
 

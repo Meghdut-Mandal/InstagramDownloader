@@ -1,18 +1,18 @@
-package com.meghdut.instagram.downloader.view
+package com.meghdut.instagram.downloader.view.ui.home
 
-import android.Manifest.permission.*
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.WindowCompat
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
 import com.apps.inslibrary.InsManager
@@ -24,6 +24,9 @@ import com.google.android.material.snackbar.Snackbar
 import com.meghdut.instagram.downloader.databinding.ActivityMainBinding
 import com.meghdut.instagram.downloader.repository.MainViewModel
 import com.meghdut.instagram.downloader.util.DownHistoryHelper
+import com.meghdut.instagram.downloader.view.INSTAGRAM_USER
+import com.meghdut.instagram.downloader.view.InstagramUserActivity
+import com.meghdut.instagram.downloader.view.LoginActivity
 import com.meghdut.instagram.downloader.view.adapters.StoriesItems
 import com.meghdut.instagram.downloader.view.adapters.UserItems
 import com.mikepenz.fastadapter.FastAdapter
@@ -32,10 +35,9 @@ import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
 
 
-class MainActivity : AppCompatActivity() {
+class HomeFragment : Fragment(), EasyPermissions.PermissionCallbacks {
 
     private var resSize: Int = 0
-    private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
 
     private val viewModel: MainViewModel by viewModels()
@@ -50,22 +52,32 @@ class MainActivity : AppCompatActivity() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 viewModel.loadUserData()
-                println("DONE ${intent.getStringExtra("userid")}")
+//                println("DONE ${intent.getStringExtra("userid")}")
             }
         }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        super.onCreate(savedInstanceState)
-
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        InsManager.init(application)
+        val root: View = binding.root
+        initUI()
+
+        return root
+    }
+
+    private fun initUI() {
+
+        lifecycleScope.launchWhenCreated {
+            viewModel.loadUserData()
+        }
 
 
         binding.apply {
             loginButton.setOnClickListener {
-                val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                val intent = Intent(context, LoginActivity::class.java)
                 resultLauncher.launch(intent)
             }
 
@@ -76,18 +88,16 @@ class MainActivity : AppCompatActivity() {
 
             clearCookies.setOnClickListener {
                 LoginHelper.outLogin()
-                finish()
+                requireActivity().finish()
             }
 
-//            viewModel.loadUserData()
-
-            val linearLayoutManager = LinearLayoutManager(applicationContext).apply {
+            val linearLayoutManager = LinearLayoutManager(context).apply {
                 orientation = LinearLayoutManager.HORIZONTAL
             }
             storiesRv.layoutManager = linearLayoutManager
             storiesRv.adapter = storiesAdapter
 
-            val linearLayoutManager2 = LinearLayoutManager(applicationContext).apply {
+            val linearLayoutManager2 = LinearLayoutManager(context).apply {
                 orientation = LinearLayoutManager.HORIZONTAL
 
             }
@@ -95,11 +105,7 @@ class MainActivity : AppCompatActivity() {
             recentUsers.adapter = userAdapter
 
             viewModel.apply {
-//                loadData.setOnClickListener {
-                loadUserData()
-//                }
-
-                recentUsers.observe(this@MainActivity) { list ->
+                recentUsers.observe(viewLifecycleOwner) { list ->
                     list?.let { recentUser ->
                         val userList = recentUser.map { it ->
                             UserItems(it).apply {
@@ -111,13 +117,13 @@ class MainActivity : AppCompatActivity() {
                         userItemAdapter.set(userList)
                     }
                 }
-                userInfo.observe(this@MainActivity) {
+                userInfo.observe(viewLifecycleOwner) {
                     it?.let { reelUser ->
                         userDp.load(reelUser.profile_pic_url)
                         userName.text = reelUser.username
                     }
                 }
-                userStories.observe(this@MainActivity) { list ->
+                userStories.observe(viewLifecycleOwner) { list ->
                     list?.let { stories ->
                         val storyList = stories.map {
                             StoriesItems(it).apply {
@@ -129,33 +135,21 @@ class MainActivity : AppCompatActivity() {
                         storyItemAdapter.set(storyList)
                     }
                 }
-                messageLiveData.observe(this@MainActivity) {
+                messageLiveData.observe(viewLifecycleOwner) {
                     it?.let {
                         toast(it)
                     }
                 }
             }
         }
-
     }
 
-    private fun launchUserActivity(instagramUser: String) {
-        val intent = Intent(applicationContext, InstagramUserActivity::class.java)
-        intent.putExtra(INSTAGRAM_USER, instagramUser)
-        startActivity(intent)
-    }
-
-
-    override fun onSupportNavigateUp(): Boolean {
-        val navController =
-            findNavController(com.meghdut.instagram.downloader.R.id.nav_host_fragment_content_main)
-        return navController.navigateUp(appBarConfiguration)
-                || super.onSupportNavigateUp()
-    }
 
     fun toast(text: String) {
-        Snackbar.make(binding.root, text, Snackbar.LENGTH_LONG).show();
+        Snackbar.make(binding.root, text, Snackbar.LENGTH_LONG).show()
     }
+
+
 
 
     fun loadInsData(str: String) {
@@ -209,13 +203,22 @@ class MainActivity : AppCompatActivity() {
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
-        permissions: Array<String>,
+        permissions: Array<String?>,
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        // Forward results to EasyPermissions
+        // EasyPermissions handles the request result.
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
+    }
+
+
+    override fun onPermissionsGranted(requestCode: Int, perms: List<String?>) {
+        Log.d("TAG", "onPermissionsGranted:" + requestCode + ":" + perms.size)
+    }
+
+    override fun onPermissionsDenied(requestCode: Int, perms: List<String?>) {
+        Log.d("TAG", "onPermissionsDenied:" + requestCode + ":" + perms.size)
     }
 
     companion object {
@@ -226,13 +229,13 @@ class MainActivity : AppCompatActivity() {
     fun downloadReel() {
         val perms =
             arrayOf(
-                WRITE_EXTERNAL_STORAGE,
-                ACCESS_NETWORK_STATE,
-                READ_EXTERNAL_STORAGE,
-                FOREGROUND_SERVICE,
-                WAKE_LOCK
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.ACCESS_NETWORK_STATE,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.FOREGROUND_SERVICE,
+                Manifest.permission.WAKE_LOCK
             )
-        if (EasyPermissions.hasPermissions(this, *perms)) {
+        if (EasyPermissions.hasPermissions(requireContext(), *perms)) {
             val link = binding.instaLinkEt.text.toString().trim()
             queryInsShareData(link)
         } else {
@@ -272,5 +275,11 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+
+    private fun launchUserActivity(instagramUser: String) {
+        val intent = Intent(activity, InstagramUserActivity::class.java)
+        intent.putExtra(INSTAGRAM_USER, instagramUser)
+        startActivity(intent)
+    }
 
 }
