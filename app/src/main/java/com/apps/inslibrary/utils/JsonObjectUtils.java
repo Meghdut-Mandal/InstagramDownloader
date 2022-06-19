@@ -2,8 +2,6 @@ package com.apps.inslibrary.utils;
 
 import com.apps.inslibrary.InstagramRes;
 import com.apps.inslibrary.entity.InstagramUser;
-import com.apps.inslibrary.http.ImagesContract;
-import com.apps.inslibrary.http.TtmlNode;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -14,8 +12,8 @@ import java.util.List;
 public class JsonObjectUtils {
     public static String parseInstagramID(JSONObject jSONObject) {
         try {
-            if (!jSONObject.isNull(TtmlNode.ATTR_ID)) {
-                return jSONObject.getString(TtmlNode.ATTR_ID);
+            if (!jSONObject.isNull("id")) {
+                return jSONObject.getString("id");
             }
             return "";
         } catch (Exception unused) {
@@ -63,12 +61,12 @@ public class JsonObjectUtils {
                 JSONArray jSONArray = jSONObject.getJSONArray("video_versions");
                 if (jSONArray.length() > 0) {
                     JSONObject jSONObject2 = jSONArray.getJSONObject(0);
-                    InstagramRes instagramRes = new InstagramRes(jSONObject2.getString(TtmlNode.ATTR_ID), true, str, jSONObject2.getString(ImagesContract.URL));
+                    InstagramRes instagramRes = new InstagramRes(jSONObject2.getString("id"), true, str, jSONObject2.getString("url"));
                     instagramRes.setDisplay_url(str2);
                     arrayList.add(instagramRes);
                 }
             } else if (!jSONObject.isNull("video_url")) {
-                InstagramRes instagramRes2 = new InstagramRes(jSONObject.getString(TtmlNode.ATTR_ID), true, str, jSONObject.getString("video_url"));
+                InstagramRes instagramRes2 = new InstagramRes(jSONObject.getString("id"), true, str, jSONObject.getString("video_url"));
                 instagramRes2.setDisplay_url(str2);
                 arrayList.add(instagramRes2);
             }
@@ -85,11 +83,11 @@ public class JsonObjectUtils {
                 if (jSONArray.length() > 0) {
                     for (int i = 0; i < jSONArray.length(); i++) {
                         JSONObject jSONObject2 = jSONArray.getJSONObject(i);
-                        String string = jSONObject2.getString(TtmlNode.ATTR_ID);
+                        String string = jSONObject2.getString("id");
                         int i2 = jSONObject2.getInt("media_type");
                         JSONArray jSONArray2 = jSONObject2.getJSONObject("image_versions2").getJSONArray("candidates");
                         if (jSONArray2.length() > 0) {
-                            arrayList.add(new InstagramRes(string, i2 == 2, str, jSONArray2.getJSONObject(0).getString(ImagesContract.URL)));
+                            arrayList.add(new InstagramRes(string, i2 == 2, str, jSONArray2.getJSONObject(0).getString("url")));
                         }
                     }
                 }
@@ -107,7 +105,7 @@ public class JsonObjectUtils {
                 String parseInstagramID = parseInstagramID(jSONObject);
                 JSONArray jSONArray4 = jSONObject.getJSONObject("image_versions2").getJSONArray("candidates");
                 if (jSONArray4.length() > 0) {
-                    arrayList.add(new InstagramRes(parseInstagramID, false, str, jSONArray4.getJSONObject(0).getString(ImagesContract.URL)));
+                    arrayList.add(new InstagramRes(parseInstagramID, false, str, jSONArray4.getJSONObject(0).getString("url")));
                 }
             } else if (!jSONObject.isNull("display_url")) {
                 arrayList.add(new InstagramRes(parseInstagramID(jSONObject), false, str, jSONObject.getString("display_url")));
@@ -126,7 +124,7 @@ public class JsonObjectUtils {
             if (!jSONObject.isNull("image_versions2")) {
                 JSONArray jSONArray = jSONObject.getJSONObject("image_versions2").getJSONArray("candidates");
                 if (jSONArray.length() > 0) {
-                    return jSONArray.getJSONObject(0).getString(ImagesContract.URL);
+                    return jSONArray.getJSONObject(0).getString("url");
                 }
                 return "";
             } else if (!jSONObject.isNull("carousel_media")) {
@@ -136,7 +134,7 @@ public class JsonObjectUtils {
                 }
                 JSONArray jSONArray3 = jSONArray2.getJSONObject(0).getJSONObject("image_versions2").getJSONArray("candidates");
                 if (jSONArray3.length() > 0) {
-                    return jSONArray3.getJSONObject(0).getString(ImagesContract.URL);
+                    return jSONArray3.getJSONObject(0).getString("url");
                 }
                 return "";
             } else if (jSONObject.isNull("image_versions2")) {
@@ -144,7 +142,7 @@ public class JsonObjectUtils {
             } else {
                 JSONArray jSONArray4 = jSONObject.getJSONObject("image_versions2").getJSONArray("candidates");
                 if (jSONArray4.length() > 0) {
-                    return jSONArray4.getJSONObject(0).getString(ImagesContract.URL);
+                    return jSONArray4.getJSONObject(0).getString("url");
                 }
                 return "";
             }
@@ -164,8 +162,8 @@ public class JsonObjectUtils {
                 instagramUser.setProfile_pic_url(parseProfilePicUrl(jSONObject2));
             } else if (!jSONObject.isNull("owner")) {
                 JSONObject jSONObject3 = jSONObject.getJSONObject("owner");
-                if (!jSONObject3.isNull(TtmlNode.ATTR_ID)) {
-                    instagramUser.setUser_id(Long.parseLong(jSONObject3.getString(TtmlNode.ATTR_ID)));
+                if (!jSONObject3.isNull("id")) {
+                    instagramUser.setUser_id(Long.parseLong(jSONObject3.getString("id")));
                 }
                 instagramUser.setUsername(parseUserName(jSONObject3));
                 instagramUser.setFull_name(parseFullName(jSONObject3));
