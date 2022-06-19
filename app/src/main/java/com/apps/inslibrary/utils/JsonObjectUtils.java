@@ -2,12 +2,14 @@ package com.apps.inslibrary.utils;
 
 import com.apps.inslibrary.InstagramRes;
 import com.apps.inslibrary.entity.InstagramUser;
+import com.apps.inslibrary.http.ImagesContract;
 import com.apps.inslibrary.http.TtmlNode;
-import com.google.android.gms.common.internal.ImagesContract;
-import java.util.ArrayList;
-import java.util.List;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class JsonObjectUtils {
     public static String parseInstagramID(JSONObject jSONObject) {

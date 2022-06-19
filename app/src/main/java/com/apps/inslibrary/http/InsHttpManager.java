@@ -24,7 +24,6 @@ import com.apps.inslibrary.interfaces.HttpListener;
 import com.apps.inslibrary.reelentity.ReelsEntity;
 import com.apps.inslibrary.utils.JsonObjectUtils;
 import com.google.common.net.HttpHeaders;
-import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.Gson;
 import org.xutils.x;
 import org.json.JSONArray;
