@@ -1,9 +1,11 @@
 package com.meghdut.instagram.downloader.view.ui.home
 
 import android.app.Application
+import android.text.TextUtils
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import com.apps.inslibrary.InsManager
 import com.apps.inslibrary.InstagramRes
 import com.apps.inslibrary.LoginHelper
 import com.apps.inslibrary.entity.FollowResult
@@ -119,6 +121,81 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 //                    this@HomeFragment.stateDialog.setTryAgain(instagramData.shareUrl)
                 }
             })
+    }
+
+    fun queryInsShareData(str: String) {
+        val cookies = LoginHelper.getCookies()
+        if (TextUtils.isEmpty(cookies)) {
+//            queryNoLoginShareData(str)
+            return
+        }
+        val hostUrl = InsManager.getHostUrl(str)
+        InsHttpManager.getShareData(hostUrl, cookies, object : HttpListener<InstagramData?> {
+            override fun onLogin(z: Boolean) {
+
+            }
+
+            override fun onSuccess(instagramData: InstagramData?) {
+                instagramData?.shareUrl = str
+                instagramData?.viewUrl = str
+                down(instagramData!!)
+            }
+
+            override fun onError(str2: String) {
+                Log.e("TAG_1", "onError:$str2")
+                throw Exception(str2)
+            }
+
+        })
+    }
+
+
+    fun loadInsData(str: String) {
+        if (!str.contains("instagram.com")) {
+//            toast("Not a valid link1")
+        } else if (DownHistoryHelper.isUrlDownHistory(str)) {
+//            toast("Already downloaded ")
+            shareUrl = ""
+        } else {
+//            this.binding.instaLinkEt.setText(str)
+//            this.stateDialog.show()
+//            this.stateDialog.setWaitDownload()
+            if (str.contains("/stories/")) {
+                val storiesId = InsManager.getStoriesId(str)
+//                FirebaseHelper.onEvent("storiesUrl", "")
+//                queryInsStoriesData(storiesId, str)
+            } else if (str.contains("/s/") && str.contains("story_media_id=")) {
+//                FirebaseHelper.onEvent("userStoriesUrl", "")
+//                queryUserStories(str)
+            } else if (str.contains("/p/") || str.contains("/reel/") || str.contains("/tv/")) {
+//                FirebaseHelper.onEvent("shareUrl", "")
+                queryInsShareData(str)
+            } else {
+                Log.e("TAG", "LINK:$str")
+//                this.stateDialog.dismiss()
+//                toast(getString(com.meghdut.instagram.downloader.R.string.valid_ins_link))
+            }
+        }
+    }
+
+
+    private fun queryUserStories(url: String) {
+        var cookies = LoginHelper.getCookies()
+        if (TextUtils.isEmpty(cookies)) {
+            cookies = LoginHelper.getTmpCookies()
+            if (TextUtils.isEmpty(cookies)) {
+                TODO("not yet done")
+//                TODO()
+//                queryTmpCookies(true, "", url)
+                return
+            }
+        }
+        getRedirectUrl(cookies, url)
+    }
+
+    fun getRedirectUrl(cookies: String, url: String) {
+
+//        AnonymousClass12(str2, url).start()
     }
 
 

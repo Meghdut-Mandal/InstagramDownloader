@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -15,14 +14,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
-import com.apps.inslibrary.InsManager
 import com.apps.inslibrary.LoginHelper
-import com.apps.inslibrary.entity.InstagramData
-import com.apps.inslibrary.http.InsHttpManager
-import com.apps.inslibrary.interfaces.HttpListener
 import com.google.android.material.snackbar.Snackbar
 import com.meghdut.instagram.downloader.databinding.ActivityMainBinding
-import com.meghdut.instagram.downloader.util.DownHistoryHelper
 import com.meghdut.instagram.downloader.view.INSTAGRAM_USER
 import com.meghdut.instagram.downloader.view.InstagramUserActivity
 import com.meghdut.instagram.downloader.view.LoginActivity
@@ -130,55 +124,6 @@ class HomeFragment : Fragment(), EasyPermissions.PermissionCallbacks {
 
 
 
-    fun loadInsData(str: String) {
-        if (!str.contains("instagram.com")) {
-            toast("Not a valid link1")
-        } else if (DownHistoryHelper.isUrlDownHistory(str)) {
-            toast("Already downloaded ")
-            viewModel.shareUrl = ""
-        } else {
-            this.binding.instaLinkEt.setText(str)
-//            this.stateDialog.show()
-//            this.stateDialog.setWaitDownload()
-            if (str.contains("/stories/")) {
-                val storiesId = InsManager.getStoriesId(str)
-//                FirebaseHelper.onEvent("storiesUrl", "")
-//                queryInsStoriesData(storiesId, str)
-            } else if (str.contains("/s/") && str.contains("story_media_id=")) {
-//                FirebaseHelper.onEvent("userStoriesUrl", "")
-//                queryUserStories(str)
-            } else if (str.contains("/p/") || str.contains("/reel/") || str.contains("/tv/")) {
-//                FirebaseHelper.onEvent("shareUrl", "")
-                queryInsShareData(str)
-            } else {
-                Log.e("TAG", "LINK:$str")
-//                this.stateDialog.dismiss()
-//                toast(getString(com.meghdut.instagram.downloader.R.string.valid_ins_link))
-            }
-        }
-    }
-
-
-    private fun queryUserStories(url: String) {
-        var cookies = LoginHelper.getCookies()
-        if (TextUtils.isEmpty(cookies)) {
-            cookies = LoginHelper.getTmpCookies()
-            if (TextUtils.isEmpty(cookies)) {
-                TODO("not yet done")
-//                TODO()
-//                queryTmpCookies(true, "", url)
-                return
-            }
-        }
-        getRedirectUrl(cookies, url)
-    }
-
-    fun getRedirectUrl(cookies: String, url: String) {
-
-//        AnonymousClass12(str2, url).start()
-    }
-
-
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String?>,
@@ -215,7 +160,7 @@ class HomeFragment : Fragment(), EasyPermissions.PermissionCallbacks {
             )
         if (EasyPermissions.hasPermissions(requireContext(), *perms)) {
             val link = binding.instaLinkEt.text.toString().trim()
-            queryInsShareData(link)
+            viewModel.queryInsShareData(link)
         } else {
             // Do not have permissions, request them now
             EasyPermissions.requestPermissions(
@@ -224,33 +169,6 @@ class HomeFragment : Fragment(), EasyPermissions.PermissionCallbacks {
             );
         }
 
-    }
-
-
-    private fun queryInsShareData(str: String) {
-        val cookies = LoginHelper.getCookies()
-        if (TextUtils.isEmpty(cookies)) {
-//            queryNoLoginShareData(str)
-            return
-        }
-        val hostUrl = InsManager.getHostUrl(str)
-        InsHttpManager.getShareData(hostUrl, cookies, object : HttpListener<InstagramData?> {
-            override fun onLogin(z: Boolean) {
-
-            }
-
-            override fun onSuccess(instagramData: InstagramData?) {
-                instagramData?.shareUrl = str
-                instagramData?.viewUrl = str
-                viewModel.down(instagramData!!)
-            }
-
-            override fun onError(str2: String) {
-                Log.e("TAG_1", "onError:$str2")
-                toast("Download Failed $str")
-            }
-
-        })
     }
 
 
