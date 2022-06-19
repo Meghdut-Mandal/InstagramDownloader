@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import coil.load
+import coil.transform.CircleCropTransformation
 import com.meghdut.instagram.downloader.R
 import com.meghdut.instagram.downloader.databinding.FragmentUserProfileBinding
 import com.meghdut.instagram.downloader.util.format
@@ -22,6 +23,7 @@ import com.mikepenz.fastadapter.adapters.ItemAdapter
 import com.mikepenz.fastadapter.scroll.EndlessRecyclerOnScrollListener
 import com.mikepenz.fastadapter.ui.items.ProgressItem
 import kotlinx.coroutines.flow.collectLatest
+import org.xutils.x.image
 
 class UserProfileFragment : Fragment() {
 
@@ -86,7 +88,10 @@ class UserProfileFragment : Fragment() {
                 userBioTv.text = graphqlUser.biography
                 supportActionBar?.subtitle = graphqlUser.username
                 supportActionBar?.title = graphqlUser.full_name
-                userProfile.load(graphqlUser.profile_pic_url_hd)
+                userProfile.load(graphqlUser.profile_pic_url_hd){
+                    crossfade(true)
+                    transformations(CircleCropTransformation())
+                }
                 userPostTv.text = graphqlUser.edge_owner_to_timeline_media.count.format()
                 userFollowTv.text = graphqlUser.edge_followed_by.count.format()
                 userFollowingTv.text = graphqlUser.edge_follow.count.format()

@@ -27,7 +27,9 @@ class UserPostItems(val post: EdgeOwnerToTimelineMediaEdges) :
 
     override fun bindView(binding: ItemUserListLayoutBinding, payloads: List<Any>) {
         val node = post.node
-        binding.ivImg.load(node.thumbnail_src)
+        binding.ivImg.load(node.thumbnail_src){
+            crossfade(true)
+        }
         if (node.isIs_video) {
             binding.ivVideo.load(R.drawable.ic_group_video)
         } else if (node.edge_sidecar_to_children?.edges?.isNotEmpty() == true) {
