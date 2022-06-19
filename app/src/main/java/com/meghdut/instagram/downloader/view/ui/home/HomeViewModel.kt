@@ -28,14 +28,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val executor: ExecutorService = Executors.newSingleThreadExecutor()
     val userInfo = MutableLiveData<ReelUser>()
     val userStories = MutableLiveData<List<ReelsEntity>>()
-    val recentUsers = MutableLiveData<List<InstagramUser>>()
     val messageLiveData = MutableLiveData<String>()
 
     fun loadUserData() {
         if (LoginHelper.getIsLogin()) {
             loadCurrentUserInfo()
             loadStories()
-//            loadRecentlyVisitedUsers()
         }
     }
 
@@ -123,23 +121,5 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             })
     }
 
-    private fun loadRecentlyVisitedUsers() {
-        val userId = LoginHelper.getUserID()
-        val cookie = LoginHelper.getCookies()
-        executor.submit {
-            InsHttpManager.getUserFollows(userId, cookie, object : HttpListener<FollowResult> {
-                override fun onError(error: String?) {
-                   throw Exception(error)
-                }
 
-                override fun onLogin(isLoggedIn: Boolean) = Unit
-
-                override fun onSuccess(result: FollowResult?) {
-                    result?.apply {
-                        recentUsers.postValue(users)
-                    }
-                }
-            })
-        }
-    }
 }

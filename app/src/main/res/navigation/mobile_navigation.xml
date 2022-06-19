@@ -19,7 +19,7 @@
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.meghdut.instagram.downloader.view.ui.notifications.NotificationsFragment"
+        android:name="com.meghdut.instagram.downloader.view.ui.notifications.AccountsFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        tools:layout="@layout/fragment_accounts" />
 </navigation>
