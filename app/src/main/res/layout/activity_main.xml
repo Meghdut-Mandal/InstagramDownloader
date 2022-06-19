@@ -4,18 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context=".view.MainActivity">
-
-    <Button
-        android:id="@+id/loginButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:text="Login Instagram"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+    android:fitsSystemWindows="true">
 
     <ImageView
         android:id="@+id/userDp"
@@ -33,6 +22,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="User Name"
+        android:textSize="16sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@+id/userDp"
         app:layout_constraintTop_toTopOf="@+id/userDp" />
 
@@ -46,17 +37,11 @@
         android:minHeight="50dp"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/userDp"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
         tools:itemCount="1"
         tools:orientation="horizontal" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.4" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputLayout"
@@ -67,7 +52,7 @@
         android:layout_marginEnd="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline2">
+        app:layout_constraintTop_toBottomOf="@+id/storiesRv">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/instaLinkEt"
@@ -75,16 +60,6 @@
             android:layout_height="wrap_content"
             android:hint="Instagram Link" />
     </com.google.android.material.textfield.TextInputLayout>
-
-    <Button
-        android:id="@+id/startButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:text="Start"
-        app:layout_constraintEnd_toEndOf="@+id/textInputLayout"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
 
     <Button
         android:id="@+id/clearCookies"
@@ -96,33 +71,36 @@
         app:layout_constraintStart_toStartOf="@+id/textInputLayout"
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recentUsers"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:minHeight="50dp"
-        app:layout_constraintEnd_toEndOf="@+id/storiesRv"
-        app:layout_constraintStart_toStartOf="@+id/storiesRv"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
-        tools:itemCount="3" />
-
-    <Button
-        android:id="@+id/loadData"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Load Recent Users"
-        app:layout_constraintEnd_toEndOf="@+id/clearCookies"
-        app:layout_constraintStart_toStartOf="@+id/clearCookies"
-        app:layout_constraintTop_toBottomOf="@+id/clearCookies" />
-
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Recent Users"
+        android:layout_marginTop="16dp"
+        android:text="Recent Stories"
         app:layout_constraintStart_toStartOf="@+id/storiesRv"
-        app:layout_constraintTop_toBottomOf="@+id/storiesRv" />
+        app:layout_constraintTop_toBottomOf="@+id/userDp" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/loginButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="16dp"
+        android:clickable="true"
+        android:src="@drawable/instagram"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <ImageButton
+        android:id="@+id/startButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:minHeight="48dp"
+        android:src="@drawable/ic_download"
+        app:layout_constraintEnd_toEndOf="@+id/textInputLayout"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout"
+        tools:ignore="SpeakableTextPresentCheck" />
 </androidx.constraintlayout.widget.ConstraintLayout>

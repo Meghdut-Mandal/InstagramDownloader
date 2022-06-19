@@ -9,11 +9,11 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.apps.inslibrary.InsManager
 import com.meghdut.instagram.downloader.R
-import com.meghdut.instagram.downloader.databinding.ActivityHomeBinding
+import com.meghdut.instagram.downloader.databinding.FragmentHomeBinding
 
 class HomeActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityHomeBinding
+    private lateinit var binding: FragmentHomeBinding
 
     override fun onSupportNavigateUp(): Boolean {
         val navController =
@@ -27,7 +27,7 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         InsManager.init(application)
 
-        binding = ActivityHomeBinding.inflate(layoutInflater)
+        binding = FragmentHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         val navView: BottomNavigationView = binding.navView

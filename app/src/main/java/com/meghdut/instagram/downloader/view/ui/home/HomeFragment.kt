@@ -22,13 +22,11 @@ import com.apps.inslibrary.http.InsHttpManager
 import com.apps.inslibrary.interfaces.HttpListener
 import com.google.android.material.snackbar.Snackbar
 import com.meghdut.instagram.downloader.databinding.ActivityMainBinding
-import com.meghdut.instagram.downloader.repository.MainViewModel
 import com.meghdut.instagram.downloader.util.DownHistoryHelper
 import com.meghdut.instagram.downloader.view.INSTAGRAM_USER
 import com.meghdut.instagram.downloader.view.InstagramUserActivity
 import com.meghdut.instagram.downloader.view.LoginActivity
 import com.meghdut.instagram.downloader.view.adapters.StoriesItems
-import com.meghdut.instagram.downloader.view.adapters.UserItems
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import pub.devrel.easypermissions.AfterPermissionGranted
@@ -40,12 +38,9 @@ class HomeFragment : Fragment(), EasyPermissions.PermissionCallbacks {
     private var resSize: Int = 0
     private lateinit var binding: ActivityMainBinding
 
-    private val viewModel: MainViewModel by viewModels()
+    private val viewModel: HomeViewModel by viewModels()
     private val storyItemAdapter by lazy { ItemAdapter<StoriesItems>() }
-    private val userItemAdapter by lazy { ItemAdapter<UserItems>() }
-
     private val storiesAdapter by lazy { FastAdapter.with(storyItemAdapter) }
-    private val userAdapter by lazy { FastAdapter.with(userItemAdapter) }
 
 
     private val resultLauncher =
@@ -97,26 +92,9 @@ class HomeFragment : Fragment(), EasyPermissions.PermissionCallbacks {
             storiesRv.layoutManager = linearLayoutManager
             storiesRv.adapter = storiesAdapter
 
-            val linearLayoutManager2 = LinearLayoutManager(context).apply {
-                orientation = LinearLayoutManager.HORIZONTAL
 
-            }
-            recentUsers.layoutManager = linearLayoutManager2
-            recentUsers.adapter = userAdapter
 
             viewModel.apply {
-                recentUsers.observe(viewLifecycleOwner) { list ->
-                    list?.let { recentUser ->
-                        val userList = recentUser.map { it ->
-                            UserItems(it).apply {
-                                onClickListener = { instagramUser ->
-                                    launchUserActivity(instagramUser.username)
-                                }
-                            }
-                        }
-                        userItemAdapter.set(userList)
-                    }
-                }
                 userInfo.observe(viewLifecycleOwner) {
                     it?.let { reelUser ->
                         userDp.load(reelUser.profile_pic_url)
