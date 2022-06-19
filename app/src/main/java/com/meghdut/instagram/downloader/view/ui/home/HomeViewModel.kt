@@ -66,7 +66,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         InsHttpManager.getReelsTrayData(cookies, object : HttpListener<List<ReelsEntity>> {
             override fun onError(str: String?) {
                 userStories.postValue(listOf())
-                throw Exception("Get stories Failed $str")
+//                throw Exception("Get stories Failed $str")
             }
 
             override fun onLogin(z: Boolean) {

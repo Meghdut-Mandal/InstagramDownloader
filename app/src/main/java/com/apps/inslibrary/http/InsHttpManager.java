@@ -771,6 +771,11 @@ public class InsHttpManager {
     }
 
     private static void get(RequestParams requestParams, final OnHttpCallback onHttpCallback) {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         x.http().get(requestParams, new Callback.CommonCallback<String>() {
             public void onCancelled(CancelledException cancelledException) {
             }

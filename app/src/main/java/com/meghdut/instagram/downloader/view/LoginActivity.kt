@@ -1,16 +1,16 @@
 package com.meghdut.instagram.downloader.view
 
+import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
-import android.webkit.CookieManager
-import android.webkit.WebChromeClient
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.webkit.*
 import androidx.appcompat.app.AppCompatActivity
 import com.apps.inslibrary.LoginHelper
 import com.meghdut.instagram.downloader.databinding.ActivityLoginBinding
+
 
 class LoginActivity : AppCompatActivity() {
 
@@ -18,11 +18,14 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(bundle)
         val loginBinding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(loginBinding.root)
-
-        loginBinding.backButton.setOnClickListener { finish() }
-        loginBinding.swipeRefreshLayout.setOnRefreshListener { loadPage(loginBinding) }
-        loadPage(loginBinding)
+        CookieManager.getInstance().removeAllCookies {
+            CookieManager.getInstance().flush()
+            loginBinding.backButton.setOnClickListener { finish() }
+            loginBinding.swipeRefreshLayout.setOnRefreshListener { loadPage(loginBinding) }
+            loadPage(loginBinding)
+        }
     }
+
 
 
     private fun loadPage(loginBinding: ActivityLoginBinding) = loginBinding.apply {
@@ -51,13 +54,6 @@ class LoginActivity : AppCompatActivity() {
     }
 
     inner class MyBrowser : WebViewClient() {
-
-        @Deprecated("Deprecated in Java")
-        override fun shouldOverrideUrlLoading(webView: WebView, str: String): Boolean {
-            webView.loadUrl(str)
-            return true
-        }
-
         override fun onPageFinished(webView: WebView, str: String) {
             super.onPageFinished(webView, str)
             val cookie = CookieManager.getInstance().getCookie(str)
