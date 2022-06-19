@@ -145,6 +145,7 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+
     override fun onSupportNavigateUp(): Boolean {
         val navController =
             findNavController(com.meghdut.instagram.downloader.R.id.nav_host_fragment_content_main)
