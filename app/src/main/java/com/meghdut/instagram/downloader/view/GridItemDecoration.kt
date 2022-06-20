@@ -150,7 +150,7 @@ class GridItemDecoration private constructor(
         }
 
         fun setVerticalSpan(f: Float): Builder {
-            mVerticalSpan = TypedValue.applyDimension(0, f, mResources.displayMetrics).toInt()
+            mVerticalSpan = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, f, mResources.displayMetrics).toInt()
             return this
         }
 
@@ -160,7 +160,7 @@ class GridItemDecoration private constructor(
         }
 
         fun setHorizontalSpan(f: Float): Builder {
-            mHorizonSpan = TypedValue.applyDimension(0, f, mResources.displayMetrics).toInt()
+            mHorizonSpan = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, f, mResources.displayMetrics).toInt()
             return this
         }
 
