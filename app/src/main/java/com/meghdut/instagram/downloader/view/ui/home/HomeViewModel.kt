@@ -32,11 +32,13 @@ class HomeViewModel(val app: Application) : AndroidViewModel(app) {
     val userStories = MutableLiveData<List<ReelsEntity>>()
     val messageLiveData = MutableLiveData<String>()
     val messageFlow = MutableSharedFlow<String>()
+    var userId = ""
 
     fun loadUserData() {
-        if (LoginHelper.getIsLogin()) {
+        if (LoginHelper.getIsLogin() && userId != LoginHelper.getUserID()) {
             loadCurrentUserInfo()
             loadStories()
+            userId = LoginHelper.getUserID()
         }
     }
 

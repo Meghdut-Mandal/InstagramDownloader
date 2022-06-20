@@ -20,18 +20,22 @@ class UserProfileViewModel(val app: Application) : AndroidViewModel(app) {
     private var pageInfo: PageInfo? = null
     private var first = 0
     val edgesFlow = MutableSharedFlow<List<EdgeOwnerToTimelineMediaEdges>>()
+    var userName: String = ""
 
     fun loadUser(userName: String) = viewModelScope.launch {
+
+        if (this@UserProfileViewModel.userName == userName) return@launch
+
         // send an empty user, to clear the previous data
-        graphqlUserLiveData.postValue(GraphqlUser().apply {
-            edge_owner_to_timeline_media = EdgeOwnerToTimelineMedia().apply {
-                edges = listOf()
-                count = 0
-                edge_followed_by = Count()
-                edge_follow = Count()
-                pageInfo = null
-            }
-        })
+            graphqlUserLiveData.postValue(GraphqlUser().apply {
+                edge_owner_to_timeline_media = EdgeOwnerToTimelineMedia().apply {
+                    edges = listOf()
+                    count = 0
+                    edge_followed_by = Count()
+                    edge_follow = Count()
+                    pageInfo = null
+                }
+            })
 
         igRequest<GraphqlUser> {
             InsHttpManager.queryUserInfoData(userName, it)
@@ -39,6 +43,7 @@ class UserProfileViewModel(val app: Application) : AndroidViewModel(app) {
             pageInfo = result.edge_owner_to_timeline_media.pageInfo
             first = result.edge_owner_to_timeline_media.edges.size
             graphqlUserLiveData.postValue(result)
+            this@UserProfileViewModel.userName = userName
         }
 
     }
