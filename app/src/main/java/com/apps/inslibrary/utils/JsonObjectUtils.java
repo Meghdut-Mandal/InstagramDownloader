@@ -98,7 +98,9 @@ public class JsonObjectUtils {
                 if (jSONArray3.length() > 0) {
                     for (int i3 = 0; i3 < jSONArray3.length(); i3++) {
                         JSONObject jSONObject3 = jSONArray3.getJSONObject(i3).getJSONObject("node");
-                        arrayList.add(new InstagramRes(parseShortCode(jSONObject3), parseType(jSONObject3), parseShortCode(jSONObject3), jSONObject.getString("display_url")));
+                        JSONArray displayResource = jSONArray3.getJSONObject(i3).getJSONObject("node").getJSONArray("display_resources");
+                        String url = displayResource.getJSONObject(displayResource.length() - 1).getString("src");
+                        arrayList.add(new InstagramRes(parseShortCode(jSONObject3), parseType(jSONObject3), parseShortCode(jSONObject3), url));
                     }
                 }
             } else if (!jSONObject.isNull("image_versions2")) {
@@ -112,6 +114,7 @@ public class JsonObjectUtils {
             }
             return arrayList;
         } catch (Exception unused) {
+            unused.printStackTrace();
         }
         return null;
     }
