@@ -16,7 +16,7 @@ class UserPostItems(val post: EdgeOwnerToTimelineMediaEdges) :
     var onClickListener: (InstagramUser) -> Unit = {}
 
     override val type: Int
-        get() = 45
+        get() = R.id.post_item
 
     override fun createBinding(
         inflater: LayoutInflater,

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item type="id" name="story_item"/>
+    <item name="user_item" type="id">23</item>
+    <item name="post_item" type="id">67</item>
+</resources>

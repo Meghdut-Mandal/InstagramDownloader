@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import coil.load
 import com.apps.inslibrary.reelentity.ReelsEntity
+import com.meghdut.instagram.downloader.R
 import com.meghdut.instagram.downloader.databinding.ItemLatestHeadLayoutBinding
 import com.mikepenz.fastadapter.binding.AbstractBindingItem
 
@@ -13,7 +14,7 @@ class StoriesItems(val reelsEntity: ReelsEntity) :
     var onClickListener: (ReelsEntity) -> Unit = {}
 
     override val type: Int
-        get() = 23
+        get() = R.id.story_item
 
     override fun bindView(binding: ItemLatestHeadLayoutBinding, payloads: List<Any>) {
         binding.ivHead.load(reelsEntity.userHead)

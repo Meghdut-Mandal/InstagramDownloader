@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import coil.load
 import com.apps.inslibrary.entity.InstagramUser
+import com.meghdut.instagram.downloader.R
 import com.meghdut.instagram.downloader.databinding.ItemLatestHeadLayoutBinding
 import com.mikepenz.fastadapter.binding.AbstractBindingItem
 
@@ -11,7 +12,7 @@ class UserItems(val instagramUser: InstagramUser) :
     AbstractBindingItem<ItemLatestHeadLayoutBinding>() {
 
     override val type: Int
-        get() = 23
+        get() = R.id.user_item
 
     var onClickListener: (InstagramUser) -> Unit = {}
 
