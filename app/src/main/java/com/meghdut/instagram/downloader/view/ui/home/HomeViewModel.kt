@@ -110,7 +110,7 @@ class HomeViewModel(val app: Application) : AndroidViewModel(app) {
             )
     }
 
-    fun queryInsShareData(str: String) = viewModelScope.launch {
+    fun downloadReel(str: String) = viewModelScope.launch {
         val cookies = LoginHelper.getCookies()
         if (TextUtils.isEmpty(cookies)) {
 //            queryNoLoginShareData(str)
@@ -146,7 +146,7 @@ class HomeViewModel(val app: Application) : AndroidViewModel(app) {
 //                queryUserStories(str)
             } else if (str.contains("/p/") || str.contains("/reel/") || str.contains("/tv/")) {
 //                FirebaseHelper.onEvent("shareUrl", "")
-                queryInsShareData(str)
+                downloadReel(str)
             } else {
                 Log.e("TAG", "LINK:$str")
 //                this.stateDialog.dismiss()
