@@ -22,5 +22,13 @@ jobs:
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-    - name: Build with Gradle
-      run: ./gradlew build
+    - name: Build Release with Gradle
+      run: ./gradlew assembleRelease
+    - name: Releasing using Hub
+      run:  kyze8439690/action-release-releaseapk@master
+      env: 
+       GITHUB_TOKEN: ${{ secrets.TOKEN }}
+       APP_FOLDER: app
+      
+    
+
