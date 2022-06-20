@@ -1,5 +1,6 @@
 package com.meghdut.instagram.downloader.view.ui
 
+import com.apps.inslibrary.LoginHelper
 import com.apps.inslibrary.interfaces.HttpListener
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.onFailure
@@ -11,7 +12,8 @@ fun <T> igRequest(handler: (HttpListener<T>) -> Unit) =
     callbackFlow {
         val listener = object : HttpListener<T> {
             override fun onError(error: String?) {
-                throw Exception(error)
+                Exception(error).printStackTrace()
+                LoginHelper.outLogin()
             }
 
             override fun onLogin(isLoggedIn: Boolean) {

@@ -66,6 +66,10 @@ class HomeFragment : Fragment(), EasyPermissions.PermissionCallbacks {
 
 
         binding.apply {
+
+            if (!LoginHelper.getIsLogin()) {
+                logInPrompt.visibility = View.VISIBLE
+            }
             loginButton.setOnClickListener {
                 val intent = Intent(context, LoginActivity::class.java)
                 resultLauncher.launch(intent)
@@ -94,6 +98,7 @@ class HomeFragment : Fragment(), EasyPermissions.PermissionCallbacks {
                     it?.let { reelUser ->
                         userDp.load(reelUser.profile_pic_url)
                         userName.text = reelUser.username
+                        logInPrompt.visibility = View.INVISIBLE
                     }
                 }
                 userStories.observe(viewLifecycleOwner) { list ->
