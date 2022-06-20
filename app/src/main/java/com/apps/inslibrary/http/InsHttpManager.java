@@ -148,8 +148,8 @@ public class InsHttpManager {
                         if (!jSONObject2.isNull("user")) {
                             instagramData.setInstagramUser(JsonObjectUtils.parseInstagramUser(jSONObject2));
                         }
-                        if (!jSONObject2.isNull(FirebaseAnalytics.Param.ITEMS)) {
-                            JSONArray jSONArray = jSONObject2.getJSONArray(FirebaseAnalytics.Param.ITEMS);
+                        if (!jSONObject2.isNull("items")) {
+                            JSONArray jSONArray = jSONObject2.getJSONArray("items");
                             if (jSONArray.length() > 0) {
                                 for (int i = 0; i < jSONArray.length(); i++) {
                                     JSONObject jSONObject3 = jSONArray.getJSONObject(i);
@@ -370,8 +370,8 @@ public class InsHttpManager {
                                     ArrayList<String> arrayList = new ArrayList<>();
                                     for (int i = 0; i < jSONArray.length(); i++) {
                                         JSONObject jSONObject2 = jSONArray.getJSONObject(i);
-                                        if (!jSONObject2.isNull(TtmlNode.ATTR_ID)) {
-                                            arrayList.add(jSONObject2.getString(TtmlNode.ATTR_ID));
+                                        if (!jSONObject2.isNull("id")) {
+                                            arrayList.add(jSONObject2.getString("id"));
                                         }
                                     }
                                     InsHttpManager.queryUserStories(queryParameter, str2, arrayList, httpListener);
@@ -425,15 +425,15 @@ public class InsHttpManager {
                             JSONObject jSONObject2 = null;
                             for (int i = 0; i < jSONArray.length(); i++) {
                                 JSONObject jSONObject3 = jSONArray.getJSONObject(i);
-                                if (!jSONObject3.isNull(FirebaseAnalytics.Param.ITEMS)) {
-                                    JSONArray jSONArray2 = jSONObject3.getJSONArray(FirebaseAnalytics.Param.ITEMS);
+                                if (!jSONObject3.isNull("items")) {
+                                    JSONArray jSONArray2 = jSONObject3.getJSONArray("items");
                                     int i2 = 0;
                                     while (true) {
                                         if (i2 >= jSONArray2.length()) {
                                             break;
                                         }
                                         JSONObject jSONObject4 = jSONArray2.getJSONObject(i2);
-                                        if (str.equals(jSONObject4.getString(TtmlNode.ATTR_ID))) {
+                                        if (str.equals(jSONObject4.getString("id"))) {
                                             instagramData.setInstagramUser(JsonObjectUtils.parseInstagramUser(jSONObject3));
                                             jSONObject2 = jSONObject4;
                                             break;
@@ -559,8 +559,8 @@ public class InsHttpManager {
                             for (int i = 0; i < jSONArray.length(); i++) {
                                 ReelsEntity reelsEntity = new ReelsEntity();
                                 JSONObject jSONObject2 = jSONArray.getJSONObject(i);
-                                if (!jSONObject2.isNull(TtmlNode.ATTR_ID)) {
-                                    reelsEntity.setId(jSONObject2.getLong(TtmlNode.ATTR_ID));
+                                if (!jSONObject2.isNull("id")) {
+                                    reelsEntity.setId(jSONObject2.getLong("id"));
                                 }
                                 if (!jSONObject2.isNull("latest_reel_media")) {
                                     reelsEntity.setLatestTime(jSONObject2.getLong("latest_reel_media"));
@@ -623,8 +623,8 @@ public class InsHttpManager {
                         if (jSONArray.length() > 0) {
                             for (int i = 0; i < jSONArray.length(); i++) {
                                 JSONObject jSONObject2 = jSONArray.getJSONObject(i);
-                                if (!jSONObject2.isNull(TtmlNode.ATTR_ID)) {
-                                    arrayList.add(String.valueOf(jSONObject2.getLong(TtmlNode.ATTR_ID)));
+                                if (!jSONObject2.isNull("id")) {
+                                    arrayList.add(String.valueOf(jSONObject2.getLong("id")));
                                 }
                             }
                             InsHttpManager.getHomeStoriesById(str, str2, arrayList, httpListener);
@@ -771,6 +771,11 @@ public class InsHttpManager {
     }
 
     private static void get(RequestParams requestParams, final OnHttpCallback onHttpCallback) {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         x.http().get(requestParams, new Callback.CommonCallback<String>() {
             public void onCancelled(CancelledException cancelledException) {
             }

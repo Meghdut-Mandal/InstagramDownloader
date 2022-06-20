@@ -40,6 +40,7 @@ public class DownUtils {
         }
     }
 
+    @Deprecated
     public static String getSaveFile(String str, boolean z) {
         String filenameFromURL = z ? getFilenameFromURL(str) : getImageFilenameFromURL(str);
         String saveFilePath = AppManager.getSettingConfig().getSaveFilePath();
@@ -50,6 +51,7 @@ public class DownUtils {
         return file.getAbsolutePath();
     }
 
+    @Deprecated
     public static String getSaveFile(InstagramUser instagramUser, String url, boolean isVideo) {
         File file;
         String filenameFromURL = isVideo ? getFilenameFromURL(url) : getImageFilenameFromURL(url);
@@ -88,13 +90,14 @@ public class DownUtils {
         }
     }
 
+    @Deprecated
     public static void down(String str, String str2, final OnDownCallback onDownCallback) {
         RequestParams requestParams = new RequestParams(str);
         new File(str2).exists();
         requestParams.setSaveFilePath(str2);
         requestParams.setMaxRetryCount(10);
         requestParams.setHttpRetryHandler(new HttpRetryHandler() { // from class: com.apps.instagram.downloader.utils.DownUtils.1
-            @Override // org.xutils.http.app.HttpRetryHandler
+            @Override
             public boolean canRetry(UriRequest uriRequest, Throwable th, int i) {
                 blackList.add(SocketTimeoutException.class);
                 blackList.add(SocketException.class);

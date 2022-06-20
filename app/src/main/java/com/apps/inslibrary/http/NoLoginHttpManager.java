@@ -179,7 +179,7 @@ public class NoLoginHttpManager {
 
     public static void getShareData(int i, final String str, final HttpListener<InstagramData> httpListener) {
         RequestParams requestParams = new RequestParams(NO_LOGIN_URL_3);
-        requestParams.addBodyParameter(ImagesContract.URL, str);
+        requestParams.addBodyParameter("url", str);
         requestParams.addBodyParameter("type", String.valueOf(i));
         post(requestParams, new HttpCallBack() {
             public void onSuccess(String str) {
@@ -187,8 +187,8 @@ public class NoLoginHttpManager {
                 try {
                     InstagramData instagramData = new InstagramData();
                     JSONObject jSONObject = new JSONObject(str);
-                    if (!jSONObject.isNull(FirebaseAnalytics.Param.ITEMS)) {
-                        JSONObject jSONObject2 = jSONObject.getJSONArray(FirebaseAnalytics.Param.ITEMS).getJSONObject(0);
+                    if (!jSONObject.isNull("items")) {
+                        JSONObject jSONObject2 = jSONObject.getJSONArray("items").getJSONObject(0);
                         instagramData.setId(JsonObjectUtils.parseInstagramID(jSONObject2));
                         String parseShortCode = JsonObjectUtils.parseShortCode(jSONObject2);
                         instagramData.setShortcode(parseShortCode);
@@ -231,7 +231,7 @@ public class NoLoginHttpManager {
     public static void getUserStoriesData(int i, final String str, final HttpListener<InstagramData> httpListener) {
         final String queryParameter = Uri.parse(str).getQueryParameter("story_media_id");
         RequestParams requestParams = new RequestParams(NO_LOGIN_URL_3);
-        requestParams.addBodyParameter(ImagesContract.URL, str);
+        requestParams.addBodyParameter("url", str);
         requestParams.addBodyParameter("type", String.valueOf(i));
         post(requestParams, new HttpCallBack() {
             public void onSuccess(String str) {
@@ -245,8 +245,8 @@ public class NoLoginHttpManager {
                             JSONObject jSONObject2 = null;
                             for (int i = 0; i < jSONArray.length(); i++) {
                                 JSONObject jSONObject3 = jSONArray.getJSONObject(i);
-                                if (!jSONObject3.isNull(FirebaseAnalytics.Param.ITEMS)) {
-                                    JSONArray jSONArray2 = jSONObject3.getJSONArray(FirebaseAnalytics.Param.ITEMS);
+                                if (!jSONObject3.isNull("items")) {
+                                    JSONArray jSONArray2 = jSONObject3.getJSONArray("items");
                                     int i2 = 0;
                                     while (true) {
                                         if (i2 >= jSONArray2.length()) {

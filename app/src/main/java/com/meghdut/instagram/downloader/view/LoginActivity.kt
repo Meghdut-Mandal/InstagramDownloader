@@ -12,17 +12,21 @@ import androidx.appcompat.app.AppCompatActivity
 import com.apps.inslibrary.LoginHelper
 import com.meghdut.instagram.downloader.databinding.ActivityLoginBinding
 
+
 class LoginActivity : AppCompatActivity() {
 
     public override fun onCreate(bundle: Bundle?) {
         super.onCreate(bundle)
         val loginBinding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(loginBinding.root)
-
-        loginBinding.backButton.setOnClickListener { finish() }
-        loginBinding.swipeRefreshLayout.setOnRefreshListener { loadPage(loginBinding) }
-        loadPage(loginBinding)
+        CookieManager.getInstance().removeAllCookies {
+            CookieManager.getInstance().flush()
+            loginBinding.backButton.setOnClickListener { finish() }
+            loginBinding.swipeRefreshLayout.setOnRefreshListener { loadPage(loginBinding) }
+            loadPage(loginBinding)
+        }
     }
+
 
 
     private fun loadPage(loginBinding: ActivityLoginBinding) = loginBinding.apply {
@@ -51,13 +55,6 @@ class LoginActivity : AppCompatActivity() {
     }
 
     inner class MyBrowser : WebViewClient() {
-
-        @Deprecated("Deprecated in Java")
-        override fun shouldOverrideUrlLoading(webView: WebView, str: String): Boolean {
-            webView.loadUrl(str)
-            return true
-        }
-
         override fun onPageFinished(webView: WebView, str: String) {
             super.onPageFinished(webView, str)
             val cookie = CookieManager.getInstance().getCookie(str)
