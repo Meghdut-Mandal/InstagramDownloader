@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.work.*
 import com.apps.inslibrary.InsManager
 import com.apps.inslibrary.InstagramRes
 import com.apps.inslibrary.LoginHelper
@@ -13,23 +14,24 @@ import com.apps.inslibrary.entity.InstagramData
 import com.apps.inslibrary.entity.login.ReelUser
 import com.apps.inslibrary.http.HttpManager
 import com.apps.inslibrary.http.InsHttpManager
-import com.apps.inslibrary.interfaces.HttpListener
 import com.apps.inslibrary.reelentity.ReelsEntity
 import com.apps.inslibrary.utils.DownUtils
-import com.apps.inslibrary.utils.DownUtils.OnDownCallback
 import com.meghdut.instagram.downloader.util.DownHistoryHelper
 import com.meghdut.instagram.downloader.view.ui.igRequest
+import com.meghdut.instagram.downloader.workers.FileDownloadWorker
+import com.meghdut.instagram.downloader.workers.FileParams
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.io.File
 
 
-class HomeViewModel(application: Application) : AndroidViewModel(application) {
+class HomeViewModel(val app: Application) : AndroidViewModel(app) {
+
     var shareUrl: String = ""
-    private var resSize: Int = 0
     val userInfo = MutableLiveData<ReelUser>()
     val userStories = MutableLiveData<List<ReelsEntity>>()
     val messageLiveData = MutableLiveData<String>()
+    val messageFlow = MutableSharedFlow<String>()
 
     fun loadUserData() {
         if (LoginHelper.getIsLogin()) {
@@ -62,47 +64,48 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun down(instagramData: InstagramData) {
-        val instagramRes = instagramData.instagramRes
-        if (instagramRes != null && instagramRes.size > 0) {
-            val size = instagramRes.size
-            this.resSize = size
-            for (instagramRes2 in instagramRes) {
-                startSingleDown(instagramRes2, instagramData)
+        val instagramResources = instagramData.instagramRes
+        if (instagramResources != null && instagramResources.size > 0) {
+            instagramResources.forEach { resource ->
+                startSingleDown(resource)
             }
         }
     }
 
-    private fun startSingleDown(instagramRes: InstagramRes, instagramData: InstagramData) {
-        val instagramUser = instagramData.instagramUser
+    private fun startSingleDown(instagramRes: InstagramRes) {
         val video_url =
             if (instagramRes.isIs_video) instagramRes.video_url else instagramRes.display_url
-        DownUtils.down(
-            video_url,
-            DownUtils.getSaveFile(instagramUser, video_url, instagramRes.isIs_video),
-            object : OnDownCallback {
 
-                override fun onLoading(j: Long, j2: Long) {}
+        val filenameFromURL =
+            if (instagramRes.isIs_video)
+                DownUtils.getFilenameFromURL(video_url)
+            else DownUtils.getImageFilenameFromURL(video_url)
 
-                override fun onStart() {}
+        val data = Data.Builder()
 
-                override fun onSuccess(file: File) {
-                    instagramRes.saveFile = file.absolutePath
-                    this@HomeViewModel.shareUrl = ""
-                    DownHistoryHelper.addDownHistory(instagramData)
-                    post("Download Complete !")
-                }
+        data.apply {
+            putString(FileParams.KEY_FILE_NAME, filenameFromURL)
+            putString(FileParams.KEY_FILE_URL, video_url)
+        }
 
-                // com.apps.instagram.downloader.utils.DownUtils.OnDownCallback
-                override fun onError(str: String) {
-                    Log.e("TAG", "：$str")
-                    throw Exception(str)
-//                    FirebaseHelper.onEvent("downloaderNo", "")
-//                    FirebaseHelper.onEvent(instagramData.shareUrl, "")
-//                    this@HomeFragment.ll_down.setFocusable(true)
-//                    this@HomeFragment.ll_down.setClickable(true)
-//                    this@HomeFragment.stateDialog.setTryAgain(instagramData.shareUrl)
-                }
-            })
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .setRequiresStorageNotLow(true)
+            .setRequiresBatteryNotLow(true)
+            .build()
+
+        val fileDownloadWorker = OneTimeWorkRequestBuilder<FileDownloadWorker>()
+            .setConstraints(constraints)
+            .setInputData(data.build())
+            .build()
+
+        WorkManager
+            .getInstance(app)
+            .enqueueUniqueWork(
+                "oneFileDownloadWork_${System.currentTimeMillis()}",
+                ExistingWorkPolicy.KEEP,
+                fileDownloadWorker
+            )
     }
 
     fun queryInsShareData(str: String) = viewModelScope.launch {
@@ -113,7 +116,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
         val hostUrl = InsManager.getHostUrl(str)
         igRequest {
-            InsHttpManager.getShareData(hostUrl, cookies,it)
+            InsHttpManager.getShareData(hostUrl, cookies, it)
         }.collectLatest { instagramData ->
             instagramData?.shareUrl = str
             instagramData?.viewUrl = str
@@ -122,11 +125,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
-    fun loadInsData(str: String) {
+    fun loadInsData(str: String) = viewModelScope.launch {
         if (!str.contains("instagram.com")) {
-//            toast("Not a valid link1")
+            messageFlow.emit("Not a valid link1")
         } else if (DownHistoryHelper.isUrlDownHistory(str)) {
-//            toast("Already downloaded ")
+            messageFlow.emit("Already downloaded ")
             shareUrl = ""
         } else {
 //            this.binding.instaLinkEt.setText(str)

@@ -14,6 +14,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.work.*
 import coil.load
 import com.apps.inslibrary.LoginHelper
 import com.google.android.material.snackbar.Snackbar
@@ -22,6 +23,8 @@ import com.meghdut.instagram.downloader.databinding.ActivityMainBinding
 import com.meghdut.instagram.downloader.view.LoginActivity
 import com.meghdut.instagram.downloader.view.adapters.StoriesItems
 import com.meghdut.instagram.downloader.view.ui.profile.UserProfileViewModel
+import com.meghdut.instagram.downloader.workers.FileDownloadWorker
+import com.meghdut.instagram.downloader.workers.FileParams
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import pub.devrel.easypermissions.AfterPermissionGranted
@@ -30,7 +33,6 @@ import pub.devrel.easypermissions.EasyPermissions
 
 class HomeFragment : Fragment(), EasyPermissions.PermissionCallbacks {
 
-    private var resSize: Int = 0
     private lateinit var binding: ActivityMainBinding
 
     private val viewModel: HomeViewModel by viewModels()
