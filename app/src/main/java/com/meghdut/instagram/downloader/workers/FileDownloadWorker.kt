@@ -108,6 +108,7 @@ class FileDownloadWorker(
             )
         val builder = NotificationCompat.Builder(context, NotificationConstants.CHANNEL_ID).apply {
             setOngoing(false)
+            setOnlyAlertOnce(true)
             setSmallIcon(R.drawable.ic_app)
             setContentTitle("Download complete")
             addAction(
@@ -125,6 +126,7 @@ class FileDownloadWorker(
     private fun updateNotification(progress: Int) {
         val builder = NotificationCompat.Builder(context, NotificationConstants.CHANNEL_ID).apply {
             setOngoing(true)
+            setOnlyAlertOnce(true)
             setSmallIcon(R.drawable.ic_app)
             setContentTitle("Downloading your file...")
             when {
