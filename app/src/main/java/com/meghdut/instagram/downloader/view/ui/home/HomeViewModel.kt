@@ -16,6 +16,9 @@ import com.apps.inslibrary.http.HttpManager
 import com.apps.inslibrary.http.InsHttpManager
 import com.apps.inslibrary.reelentity.ReelsEntity
 import com.apps.inslibrary.utils.DownUtils
+import com.google.gson.Gson
+import com.meghdut.instagram.downloader.entity.DownloadItem
+import com.meghdut.instagram.downloader.entity.DownloadRequest
 import com.meghdut.instagram.downloader.util.DownHistoryHelper
 import com.meghdut.instagram.downloader.view.ui.igRequest
 import com.meghdut.instagram.downloader.workers.FileDownloadWorker
@@ -68,26 +71,32 @@ class HomeViewModel(val app: Application) : AndroidViewModel(app) {
     fun down(instagramData: InstagramData) {
         val instagramResources = instagramData.instagramRes
         if (instagramResources != null && instagramResources.size > 0) {
-            instagramResources.forEach { resource ->
-                startSingleDown(resource)
+            val downloadRequest =
+                DownloadRequest(instagramData.instagramUser.full_name, instagramData.describe)
+            val items = instagramResources.map { instagramRes ->
+                val downloadUrl =
+                    if (instagramRes.isIs_video) instagramRes.video_url else instagramRes.display_url
+
+                val filenameFromURL =
+                    if (instagramRes.isIs_video)
+                        DownUtils.getFilenameFromURL(downloadUrl)
+                    else DownUtils.getImageFilenameFromURL(downloadUrl)
+
+                DownloadItem(filenameFromURL, downloadUrl)
             }
+            downloadRequest.downloadItems = items
+            startDownload(downloadRequest)
         }
     }
 
-    private fun startSingleDown(instagramRes: InstagramRes) {
-        val video_url =
-            if (instagramRes.isIs_video) instagramRes.video_url else instagramRes.display_url
 
-        val filenameFromURL =
-            if (instagramRes.isIs_video)
-                DownUtils.getFilenameFromURL(video_url)
-            else DownUtils.getImageFilenameFromURL(video_url)
+    private fun startDownload(downloadRequest: DownloadRequest) {
 
+        val requestStr = Gson().toJson(downloadRequest)
         val data = Data.Builder()
 
         data.apply {
-            putString(FileParams.KEY_FILE_NAME, filenameFromURL)
-            putString(FileParams.KEY_FILE_URL, video_url)
+            putString(FileParams.KEY_DOWNLOAD_REQUEST, requestStr)
         }
 
         val constraints = Constraints.Builder()

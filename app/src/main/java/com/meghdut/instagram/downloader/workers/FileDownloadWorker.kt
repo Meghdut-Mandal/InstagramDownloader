@@ -16,16 +16,24 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import androidx.work.CoroutineWorker
+import androidx.work.Data
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.google.gson.Gson
 import com.meghdut.instagram.downloader.R
+import com.meghdut.instagram.downloader.entity.DownloadItem
+import com.meghdut.instagram.downloader.entity.DownloadRequest
 import com.meghdut.instagram.downloader.util.ProgressResponseBody
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
+import java.util.concurrent.Executors
 import kotlin.random.Random
 
 
@@ -35,19 +43,20 @@ class FileDownloadWorker(
 ) : CoroutineWorker(context, workerParameters) {
 
     private var notificationId: Int = -1
+    private var downloadedCount = 1
+    private lateinit var downloadRequest: DownloadRequest
+    private val singleThreadContext = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
     override suspend fun doWork(): Result {
 
-        val fileUrl = inputData.getString(FileParams.KEY_FILE_URL) ?: ""
-        val fileName = inputData.getString(FileParams.KEY_FILE_NAME) ?: ""
+        val requestStr =
+            inputData.getString(FileParams.KEY_DOWNLOAD_REQUEST) ?: return Result.failure(
+                Data.Builder().put("error", "Download Request was null").build()
+            )
 
-        Log.d("TAG", "doWork: $fileUrl | $fileName ")
+        downloadRequest = Gson().fromJson(requestStr, DownloadRequest::class.java)
 
+        Log.d("TAG", "doWork: $requestStr ")
 
-        if (fileName.isEmpty()
-            || fileUrl.isEmpty()
-        ) {
-            Result.failure()
-        }
         notificationId = Random.nextInt(10_0000_000)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -64,27 +73,36 @@ class FileDownloadWorker(
             notificationManager?.createNotificationChannel(channel)
 
         }
-        val mimeType = getMimeType(fileUrl)
-
         updateNotification(0)
 
+        return withContext(singleThreadContext) {
+            val (uri, mimeType) = downloadRequest.downloadItems.map {
+                synDownload(it)
+            }.firstOrNull() ?: return@withContext Result.failure()
+
+            downloadComplete(uri!!, mimeType)
+            Result.success(workDataOf("URI" to uri.toString()))
+        }
+    }
+
+
+    private suspend fun synDownload(downloadItem: DownloadItem): Pair<Uri?, String> {
+
+        println("Starting Download for $downloadItem")
+        val mimeType = getMimeType(downloadItem.downloadUrl)
+
         val uri = getSavedFileUri(
-            fileName = fileName,
-            fileUrl = fileUrl,
+            fileName = downloadItem.fileName,
+            fileUrl = downloadItem.downloadUrl,
             context = context,
             ::downloadContent
         )
-
-        return if (uri != null) {
-            downloadComplete(uri,mimeType)
-            Result.success(workDataOf(FileParams.KEY_FILE_URI to uri.toString()))
-        } else {
-            Result.failure()
-        }
-
+        downloadedCount++
+        return uri to mimeType
     }
 
-    private fun downloadComplete(mediaUri: Uri,mimeType:String) {
+
+    private fun downloadComplete(mediaUri: Uri, mimeType: String) {
         val shareIntent = Intent()
         shareIntent.action = Intent.ACTION_SEND
         shareIntent.putExtra(Intent.EXTRA_STREAM, mediaUri)
@@ -110,7 +128,8 @@ class FileDownloadWorker(
             setOngoing(false)
             setOnlyAlertOnce(true)
             setSmallIcon(R.drawable.ic_app)
-            setContentTitle("Download complete")
+            setContentTitle("Downloaded ${downloadRequest.userName} content")
+            setSubText(downloadRequest.description)
             addAction(
                 NotificationCompat.Action(
                     R.drawable.ic_share,
@@ -127,8 +146,13 @@ class FileDownloadWorker(
         val builder = NotificationCompat.Builder(context, NotificationConstants.CHANNEL_ID).apply {
             setOngoing(true)
             setOnlyAlertOnce(true)
+            setSubText(downloadRequest.description)
             setSmallIcon(R.drawable.ic_app)
-            setContentTitle("Downloading your file...")
+            if (downloadRequest.downloadItems.size == 1) {
+                setContentTitle("Downloading .. ")
+            } else {
+                setContentTitle("Downloading $downloadedCount of ${downloadRequest.downloadItems.size} ")
+            }
             when {
                 progress <= 0 -> setProgress(0, 0, true)
                 progress in 1..99 -> setProgress(100, progress, false)
@@ -140,6 +164,7 @@ class FileDownloadWorker(
 
 
     private fun downloadContent(fileUrl: String,outputStream: OutputStream) {
+        Thread.sleep(1000)
         val progressListener: ProgressResponseBody.ProgressListener =
             object : ProgressResponseBody.ProgressListener {
                 var time: Long = 0
@@ -184,15 +209,15 @@ class FileDownloadWorker(
         return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension) ?: ""
     }
 
-    private fun getSavedFileUri(
+    private suspend fun getSavedFileUri(
         fileName: String,
         fileUrl: String,
         context: Context,
-        consumer: (String,OutputStream) -> Unit
-    ): Uri? {
+        consumer: (String, OutputStream) -> Unit
+    ): Uri? = coroutineScope {
         val mimeType = getMimeType(fileUrl)
 
-        if (mimeType.isEmpty()) return null
+        if (mimeType.isEmpty()) return@coroutineScope null
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val contentValues = ContentValues().apply {
@@ -204,35 +229,33 @@ class FileDownloadWorker(
             val resolver = context.contentResolver
 
             val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+                ?: return@coroutineScope null
 
-            return if (uri != null) {
+            runCatching {
                 resolver.openOutputStream(uri).use { output ->
-                    consumer(fileUrl,output!!)
+                    consumer(fileUrl, output!!)
                 }
-                uri
-            } else {
-                null
             }
-
+            return@coroutineScope uri
         } else {
 
             val target = File(
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
                 fileName
             )
-            FileOutputStream(target).use { output ->
-                consumer(fileUrl,output)
+            runCatching {
+                FileOutputStream(target).use { output ->
+                    consumer(fileUrl, output)
+                }
             }
-            return target.toUri()
+            return@coroutineScope target.toUri()
         }
     }
 
 }
 
 object FileParams {
-    const val KEY_FILE_URL = "key_file_url"
-    const val KEY_FILE_NAME = "key_file_name"
-    const val KEY_FILE_URI = "key_file_uri"
+    const val KEY_DOWNLOAD_REQUEST = "key_download_request"
 }
 
 object NotificationConstants {
